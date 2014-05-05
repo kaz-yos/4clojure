@@ -831,7 +831,7 @@
 
 (defn __ [f s]
   (let [ks (map f s)]
-    ;;                                        v 
+    ;;                                        v
     (->> (interleave ks s)
          (partition 2                          )
          (map #(zipmap [(first %)] [(last %)]) )
@@ -855,7 +855,7 @@
 
 (defn __ [f s]
   (let [ks (map f s)]
-    
+
     (apply
      (partial merge-with conj)
      (->> (interleave ks s)
@@ -1177,7 +1177,7 @@
 (defn __ [n sq]
   (loop [s sq
          i 0]
-    (cond 
+    (cond
      (n > 0) (if (= i n)
                s
                (recur (conj (vec (rest s)) (first s)) (inc i)))
@@ -1185,7 +1185,7 @@
      (n < 0) (if (= i n)
                s
                (recur (cons (last s) (butlast s)) (dec i)))
-     
+
      :else s)
     ))
 
@@ -1228,7 +1228,7 @@
 ;;
 ;; Sequential destructuring allows you to bind symbols to parts of sequential things (vectors, lists, seqs, etc.): <a href="http://clojure.org/special_forms#Special Forms--(let [bindings* ] exprs*)">(let [bindings* ] exprs*)</a>
 ;;
-;; 
+;;
 ;;
 ;; Complete the bindings so all let-parts evaluate to 3.
 ;;
@@ -1237,10 +1237,10 @@
 (= 3
    (let [[f s] [+ (range 3)]]
      (apply f s))
-   
+
    (let [[[f s] b] [[+ 1] 2]]
      (f s b))
-   
+
    (let [[f s] [inc 2]]
      (f s)))
 
@@ -1415,7 +1415,7 @@
 
 (defn __ [s]
   (let [intlv (partition 2 (interleave s (repeat 1)))]
-    
+
     (->> intlv
          (map #(zipmap [(first %)] [(last %)]))
          (apply merge-with + )
@@ -1496,3 +1496,79 @@
 (= "HELLO" ((__ #(.toUpperCase %) #(apply str %) take) 5 "hello world"))
 
 
+
+;; 4Clojure Question 135
+;;
+;; Your friend Joe is always whining about Lisps using the prefix notation for math. Show him how you could easily write a function that does math using the infix notation. Is your favorite language that flexible, Joe?
+;;
+;;
+;;
+;; Write a function that accepts a variable length mathematical expression consisting of numbers and the operations +, -, *, and /. Assume a simple calculator that does not do precedence and instead just calculates left to right.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; 3 elements only
+(defn __ [a b c]
+  (b a c))
+(__ 2 + 5)
+
+(defn __ [& args]
+  (let [oprs (filter #(#{+ - * /} %) args)
+        nums (filter #(not (#{+ - * /} %)) args)]
+    oprs
+    ))
+
+;; kaz-yos's solution
+(defn __ [& args]
+  (let [operators (filter #(#{+ - * /} %)       args)
+        numbers   (filter #(not (#{+ - * /} %)) args)
+        init-val  (first numbers)
+        numbers   (rest  numbers)]
+
+    (loop [oprs    operators    ; list of operators
+           nums    numbers      ; list of numbers
+           cur-val init-val]    ; current result
+      (if (and (= 1 (count oprs))
+               (= 1 (count nums)))
+        ;; Last case
+        ((first oprs) cur-val (first nums))
+        ;; Non-last case
+        (recur (rest oprs) (rest nums) ((first oprs) cur-val (first nums))))
+      )
+    ))
+
+;; _pcl's solution
+(defn __ [& args]
+  (reduce #((first %2) %1 (second %2)) (first args) (partition 2 (rest args))))
+
+(= 7  (__ 2 + 5))
+(= 42 (__ 38 + 48 - 2 / 2))
+(= 8  (__ 10 / 2 - 1 * 2))
+(= 72 (__ 20 / 2 + 2 + 4 + 8 - 6 - 10 * 9))
+
+
+
+
+;; 4Clojure Question 59
+;;
+;; Take a set of functions and return a new function that takes a variable number of arguments and returns a sequence containing the result of applying each function left-to-right to the argument list.
+;;
+;; Restrictions (please don't use these function(s)): juxt
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; just is the one we want
+;; juxt returns a function that apply each function and return the results in a vector
+((juxt + max min) 2 3 5 1 6 4)
+
+(defn __ [& args1]
+  (fn [& args2]
+    (vec (map #(apply % args2) args1))))
+
+(defn __ [& fns]
+  (fn [& xs]
+    (vec (map #(apply % xs) fns))))
+
+(= [21 6 1] ((__ + max min) 2 3 5 1 6 4))
+(= ["HELLO" 5] ((__ #(.toUpperCase %) count) "hello"))
+(= [2 6 4] ((__ :a :c :b) {:a 2, :b 4, :c 6, :d 8 :e 10}))
