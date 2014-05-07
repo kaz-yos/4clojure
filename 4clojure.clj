@@ -1655,7 +1655,7 @@
 (defn __ [v]
   (if (= 1 (count v))
     (conj v (first v))
-    
+
     (let [fst (first v)
           lst (last  v)
           mdl (loop [v-in v
@@ -1664,7 +1664,7 @@
                 (conj v-out (reduce + v-in))
                 (recur (rest v-in) (conj v-out (reduce + (take 2 v-in)))))
               )]
-      
+
       (flatten [fst mdl lst])
       ))
   )
@@ -1673,7 +1673,7 @@
 (defn __ [v] (iterate (fn [v]
                 (if (= 1 (count v))
                   (conj v (first v))
-    
+
                   (let [fst (first v)
                         lst (last  v)
                         mdl (loop [v-in v
@@ -1682,7 +1682,7 @@
                                 (conj v-out (reduce +' v-in))
                                 (recur (rest v-in) (conj v-out (reduce +' (take 2 v-in)))))
                               )]
-      
+
                     (flatten [fst mdl lst])
                     ))
                 ) v))
@@ -1817,7 +1817,7 @@
 
     (if (= 0 (count r))
       acc
-      
+
       (if (re-find (first r) s)
         (recur (clojure.string/replace s (re-pattern (first r)) "") (rest r) (rest n) (+ acc (first n)))
         (recur s (rest r) (rest n) acc)
@@ -1835,7 +1835,7 @@
 
                   (if (= 0 (count r))
                     [s acc]
-                    
+
                     (if (re-find (first r) s)
                       (recur (clojure.string/replace s (re-pattern (first r)) "") (rest r) (rest n) (+ acc (first n)))
                       (recur s (rest r) (rest n) acc)
@@ -1874,7 +1874,7 @@
 
       (if (= 0 (count r2))
         acc2
-        
+
         (if-let [match-seq (re-seq (first r2) s2)]
           (recur (clojure.string/replace s2 (re-pattern (first r2)) "") (rest r2) (rest n2) (+ acc2 (* (count match-seq) (first n2))))
           (recur s2 (rest r2) (rest n2) acc2)
@@ -1882,6 +1882,73 @@
 
 (__ "MMMCMXCIX")
 
+
+;; Using only the second loop in the previous one
+(defn __ [st]
+  ;; first step is assignment to [s acc]
+  (loop [r   [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV" #"M" #"D" #"C" #"L" #"X" #"V" #"I"]
+         n   [900 400 90 40 9 4 1000 500 100 50 10 5 1]
+         s   st
+         acc 0]
+
+    ;; Loop until all regex are used
+    (if (= 0 (count r))
+      ;; If exhausted, return the accumulated number
+      acc
+      ;; Otherwise, check if there are matches, and add corresponding number
+      (if-let [match-seq (re-seq (first r) s)]
+        ;; if there are matches, remove the matching parts, add correpsonding number to accumulator
+        (recur (rest r) (rest n) (clojure.string/replace s (re-pattern (first r)) "")
+               (+ acc (* (count match-seq) (first n))))
+        ;; if there are no matches, move on without changing the string or adding number
+        (recur (rest r) (rest n) s
+               acc)))))
+
+;; without comments
+(defn __ [st]
+  (loop [r   [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV" #"M" #"D" #"C" #"L" #"X" #"V" #"I"]
+         n   [900 400 90 40 9 4 1000 500 100 50 10 5 1]
+         s   st
+         acc 0]
+    (if (= 0 (count r))
+      acc
+      (if-let [match-seq (re-seq (first r) s)]
+        (recur (rest r) (rest n) (clojure.string/replace s (re-pattern (first r)) "")
+               (+ acc (* (count match-seq) (first n))))
+        (recur (rest r) (rest n) s
+               acc)))))
+
+;; without two recur's
+(defn __ [st]
+  (loop [r   [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV" #"M" #"D" #"C" #"L" #"X" #"V" #"I"]
+         n   [900 400 90 40 9 4 1000 500 100 50 10 5 1]
+         s   st
+         acc 0]
+    (if (= 0 (count r))
+      acc
+      (recur (rest r) (rest n)
+             ;; remove the matching parts from s
+             (clojure.string/replace s (re-pattern (first r)) "")
+             ;; add number corresponding to number of matches
+             (+ acc (* (count (re-seq (first r) s)) (first n)))))))
+(__ "MMMCMXCIX")
+
+;; 
+(defn __ [x]
+  (let
+    [R {\I 1, \V 5, \X 10, \L 50, \C 100, \D 500, \M 1000}]
+    (reduce +
+      (map
+        (partial reduce #(- (R %2) %1) 0)
+        (re-seq #"IV|IX|XL|XC|XM|CD|CM|[IVXLCDM]" x)))))
+
+;; Returns a lazy sequence of successive matches
+(re-seq #"IV|IX|XL|XC|XM|CD|CM|[IVXLCDM]" "MMMCMXCIX")
+;; ("M" "M" "M" "CM" "XC" "IX")
+
+(map
+ (partial reduce #(- ({\I 1, \V 5, \X 10, \L 50, \C 100, \D 500, \M 1000} %2) %1) 0)
+ (re-seq #"IV|IX|XL|XC|XM|CD|CM|[IVXLCDM]" "MMMCMXCIX"))
 
 (= 14 (__ "XIV"))
 (= 827 (__ "DCCCXXVII"))
