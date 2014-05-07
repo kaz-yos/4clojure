@@ -1729,3 +1729,34 @@
 (= (__ 496) true)
 (= (__ 500) false)
 (= (__ 8128) true)
+
+
+;; 4Clojure Question 97
+;;
+;; <a href="http://en.wikipedia.org/wiki/Pascal%27s_triangle">Pascal's triangle</a> is a triangle of numbers computed using the following rules:<br/></br>- The first row is 1.</br>- Each successive row is computed by adding together adjacent numbers in the row above, and adding a 1 to the beginning and end of the row.<br/><br/>Write a function which returns the nth row of Pascal's Triangle.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(defn __ [n]
+  (iterate
+   (fn [v]
+     (mapv #(+' %1 %2) (concat [0] v) (concat v [0])))
+   [1]))
+
+(defn __ [n]
+  (nth (iterate
+    (fn [v]
+      (mapv #(+' %1 %2) (concat [0] v) (concat v [0])))
+    [1]) (dec n)))
+
+(= (__ 1) [1])
+
+(= (map __ (range 1 6))
+   [     [1]
+        [1 1]
+       [1 2 1]
+      [1 3 3 1]
+     [1 4 6 4 1]])
+
+(= (__ 11)
+   [1 10 45 120 210 252 210 120 45 10 1])
