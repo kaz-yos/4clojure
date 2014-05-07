@@ -1687,6 +1687,21 @@
                     ))
                 ) v))
 
+(defn __ [v]
+  (let [v1 (conj   v 0)
+        v2 (concat [0] v)]
+    (map #(+' %1 %2) v1 v2)
+    ))
+
+(defn __ [v]
+  (iterate
+   (fn [v]
+     (let [v1 (concat   v [0])
+           v2 (concat  [0] v)]
+       (mapv #(+' %1 %2) v1 v2)
+       ))
+   v))
+
 (= (second (__ [2 3 2])) [2 5 5 2])
 (= (take 5 (__ [1])) [[1] [1 1] [1 2 1] [1 3 3 1] [1 4 6 4 1]])
 (= (take 2 (__ [3 1 2])) [[3 1 2] [3 4 3 2]])
@@ -1700,12 +1715,17 @@
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
 
+(defn __ [n]
+  (= n (apply + (filter #(= 0 (rem n %)) (range 1 n)))))
+
+(defn __ [n]
+  (->> (range 1 n)
+       (filter #(= 0 (rem n %)) )
+       (apply +                 )
+       (= n                     )))
+
 (= (__ 6) true)
-
 (= (__ 7) false)
-
 (= (__ 496) true)
-
 (= (__ 500) false)
-
 (= (__ 8128) true)
