@@ -1760,3 +1760,131 @@
 
 (= (__ 11)
    [1 10 45 120 210 252 210 120 45 10 1])
+
+
+
+;; 4Clojure Question 104
+;;
+;; This is the inverse of <a href='92'>Problem 92</a>, but much easier. Given an integer smaller than 4000, return the corresponding roman numeral in uppercase, adhering to the <a href='http://www.numericana.com/answer/roman.htm#valid'>subtractive principle</a>.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(= "I" (__ 1))
+(= "XXX" (__ 30))
+(= "IV" (__ 4))
+(= "CXL" (__ 140))
+(= "DCCCXXVII" (__ 827))
+(= "MMMCMXCIX" (__ 3999))
+(= "XLVIII" (__ 48))
+
+
+
+
+;; 4Clojure Question 92
+;;
+;; Roman numerals are easy to recognize, but not everyone knows all the rules necessary to work with them. Write a function to parse a Roman-numeral string and return the number it represents.
+;;
+;; <br /><br />
+;;
+;; You can assume that the input will be well-formed, in upper-case, and follow the <a href="http://en.wikipedia.org/wiki/Roman_numerals#Subtractive_principle">subtractive principle</a>. You don't need to handle any numbers greater than MMMCMXCIX (3999), the largest number representable with ordinary letters.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+
+(def roman {"I" 1, "IV" 4, "V" 5, "IX" 9, "X" 10, "XL" 40, "L" 50, "XC" 90, "C" 100, "CD" 400, "D" 500, "CM" 900, "M" 1000})
+(roman "V")
+
+(def roman-combo #{"CM" "CD" "XC" "XL" "IX" "IV"})
+[900 400 90 40 9 4]
+
+"M M M CM XC IX"
+
+;; take 4's and 9's first?
+(re-find #"CM" "MMMCMXCIX")
+
+;; Replace CM
+(if (re-find #"CM" "MMMCMXCIX")
+  (clojure.string/replace "MMMCMXCIX" "CM" "")
+  "MMMCMXCIX")
+
+
+;; this one calculate the 9's and 4's only
+(defn __ [st]
+  (loop [s st
+         r [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV"]
+         n [900  400   90   40    9    4]
+         acc 0]
+
+    (if (= 0 (count r))
+      acc
+      
+      (if (re-find (first r) s)
+        (recur (clojure.string/replace s (re-pattern (first r)) "") (rest r) (rest n) (+ acc (first n)))
+        (recur s (rest r) (rest n) acc)
+        )
+      )
+    ))
+
+(defn __ [st]
+  (let [[s acc] (loop [s st
+                       r [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV"]
+                       n [900  400   90   40    9    4]
+                       acc 0]
+
+                  (if (= 0 (count r))
+                    [s acc]
+                    
+                    (if (re-find (first r) s)
+                      (recur (clojure.string/replace s (re-pattern (first r)) "") (rest r) (rest n) (+ acc (first n)))
+                      (recur s (rest r) (rest n) acc)
+                      )
+                    )
+                  )]
+
+    (group-by identity s)
+
+    ))
+
+(defn __ [st]
+  (let [[s acc] (loop [s st
+                       r [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV"]
+                       n [900  400   90   40    9    4]
+                       acc 0]
+
+                  (if (= 0 (count r))
+                    [s acc]
+                    
+                    (if (re-find (first r) s)
+                      (recur (clojure.string/replace s (re-pattern (first r)) "") (rest r) (rest n) (+ acc (first n)))
+                      (recur s (rest r) (rest n) acc)
+                      )
+                    )
+                  )]
+
+    (loop [s2 s
+           r2 [#"M" #"D" #"C" #"L" #"X" #"V" #"I"]
+           n2 [1000 500 100 50 10 5 1]
+           acc2 acc]
+
+      (if (= 0 (count r2))
+        acc2
+        
+        (if-let [match-seq (re-seq (first r2) s2)]
+          (recur (clojure.string/replace s2 (re-pattern (first r2)) "") (rest r2) (rest n2) (+ acc2 (count match-seq)))
+          (recur s2 (rest r2) (rest n2) acc2)
+          ))
+      )
+
+    ))
+
+["M"  "D" "C" "L" "X" "V" "I"]
+[1000 500 100 50 10 5 1]
+
+(keys (__ "XLVIII"))
+(vals (__ "XLVIII"))
+
+
+(= 14 (__ "XIV"))
+(= 827 (__ "DCCCXXVII"))
+(= 3999 (__ "MMMCMXCIX"))
+(= 48 (__ "XLVIII"))
