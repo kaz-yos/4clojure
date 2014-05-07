@@ -1824,7 +1824,9 @@
         )
       )
     ))
+(__ "MMMCMXCIX")
 
+;; just return the first step results. both number and the remaining letters
 (defn __ [st]
   (let [[s acc] (loop [s st
                        r [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV"]
@@ -1841,47 +1843,44 @@
                     )
                   )]
 
-    (group-by identity s)
-
+    [s acc]
     ))
+(__ "MMMCMXCIX")
 
+
+;; preliminary version that works
 (defn __ [st]
-  (let [[s acc] (loop [s st
-                       r [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV"]
-                       n [900  400   90   40    9    4]
+  ;; first step is assignment to [s acc]
+  (let [[s acc] (loop [s   st
+                       r   [#"CM" #"CD" #"XC" #"XL" #"IX" #"IV"]
+                       n   [900  400   90   40    9    4]
                        acc 0]
 
+                  ;; Loop until all regex are used
                   (if (= 0 (count r))
+                    ;; Return the remaining string and accumulated number
                     [s acc]
-                    
+                    ;; Otherwise, check if there is a match, and add corresponding number
                     (if (re-find (first r) s)
                       (recur (clojure.string/replace s (re-pattern (first r)) "") (rest r) (rest n) (+ acc (first n)))
                       (recur s (rest r) (rest n) acc)
-                      )
-                    )
-                  )]
+                      )))]
 
-    (loop [s2 s
-           r2 [#"M" #"D" #"C" #"L" #"X" #"V" #"I"]
-           n2 [1000 500 100 50 10 5 1]
+    ;; 2nd step using the first step results
+    (loop [s2   s
+           r2   [#"M" #"D" #"C" #"L" #"X" #"V" #"I"]
+           n2   [1000 500 100 50 10 5 1]
            acc2 acc]
 
       (if (= 0 (count r2))
         acc2
         
         (if-let [match-seq (re-seq (first r2) s2)]
-          (recur (clojure.string/replace s2 (re-pattern (first r2)) "") (rest r2) (rest n2) (+ acc2 (count match-seq)))
+          (recur (clojure.string/replace s2 (re-pattern (first r2)) "") (rest r2) (rest n2) (+ acc2 (* (count match-seq) (first n2))))
           (recur s2 (rest r2) (rest n2) acc2)
-          ))
-      )
+          )))))
 
-    ))
-
-["M"  "D" "C" "L" "X" "V" "I"]
-[1000 500 100 50 10 5 1]
-
-(keys (__ "XLVIII"))
-(vals (__ "XLVIII"))
+(__ "MMMCMXCIX")
 
 
 (= 14 (__ "XIV"))
