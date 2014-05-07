@@ -1769,6 +1769,29 @@
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
 
+[1000 900 500 400 100 90 50 40 10 9 5 4 1]
+["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"]
+
+;; Loop solution.
+(defn __ [n]
+  (loop [d   [1000 900 500 400 100 90 50 40 10 9 5 4 1]
+         r   ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"]
+         n1  n
+         acc ""]
+    
+    (if (= 0 (count d))
+      ;; if the digits are exhausted
+      acc
+      ;; otherwise, recur
+      (let [div   (first d)
+            times (quot n1 div) ; how many divisors are contained
+            remdr (rem  n1 div)]; reminder for next iteration
+        
+        (recur (rest d) (rest r) remdr (str acc (apply str (repeat times (first r)))))))))
+
+;; using a builtin function
+(defn __ [x] (clojure.pprint/cl-format nil "~@R" x))
+
 (= "I" (__ 1))
 (= "XXX" (__ 30))
 (= "IV" (__ 4))
@@ -1776,6 +1799,8 @@
 (= "DCCCXXVII" (__ 827))
 (= "MMMCMXCIX" (__ 3999))
 (= "XLVIII" (__ 48))
+
+
 
 
 
