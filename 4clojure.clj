@@ -801,7 +801,7 @@
 (__ #(> % 5) [1 3 6 8])
 (__ #(apply / %) [[1 2] [2 4] [4 6] [3 6]])
 
-
+;; merge-with is not successful
 (apply merge-with vector '({false 1} {false 3} {true 6} {true 8}))
 (apply merge-with list '({1/2 [1 2]} {1/2 [2 4]} {2/3 [4 6]} {1/2 [3 6]}))
 
@@ -855,6 +855,12 @@
 (map (fn [x] {(key x)
               (val x)})
      {2/3 [4 6], 1/2 [[[1 2] [2 4]] [3 6]]})
+
+
+;; keys
+(defn __ [f s]
+  (let [ks (map f s)]
+    (map (fn [x] (zipmap [(first x)] [(last x)])) (partition 2 (interleave ks s)))))
 
 
 (= (__ #(> % 5) [1 3 6 8]) {false [1 3], true [6 8]})
