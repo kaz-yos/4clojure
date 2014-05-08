@@ -776,32 +776,28 @@
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
 
+;; what we want is group-by
 (defn __ [f s]
   (group-by f s))
 
+;; interleaving
 (defn __ [f s]
   (let [ks (map f s)
         vs s]
-
     (interleave ks vs)))
-
 (__ #(> % 5) [1 3 6 8])
 
-
+;; partition every 2
 (defn __ [f s]
   (let [ks (map f s)
         vs s]
-
     (partition 2 (interleave ks vs))))
-
 (__ #(> % 5) [1 3 6 8])
 
-
+;; create 1-pair maps
 (defn __ [f s]
   (let [ks (map f s)]
-
     (map (fn [x] (zipmap [(first x)] [(last x)])) (partition 2 (interleave ks s)))))
-
 (__ #(> % 5) [1 3 6 8])
 (__ #(apply / %) [[1 2] [2 4] [4 6] [3 6]])
 
@@ -852,23 +848,6 @@
 (apply merge-with (comp list list) [{1 [1]} {2 [1 2]} {1 [3]} {3 [1 2 3]} {2 [2 3]}])
 
 (filter #(= 1 (keys %)) [{1 [1]} {2 [1 2]} {1 [3]} {3 [1 2 3]} {2 [2 3]}])
-
-(defn __ [f s]
-  (let [ks (map f s)]
-
-    (apply
-     (partial merge-with conj)
-     (->> (interleave ks s)
-          (partition 2                          )
-          (map #(zipmap [(first %)] [(last %)]) )
-          (reduce (partial merge-with list) )
-          ))
-    ))
-
-
-(__ #(> % 5) [1 3 6 8])
-(__ #(apply / %) [[1 2] [2 4] [4 6] [3 6]])
-(__ count [[1] [1 2] [3] [1 2 3] [2 3]])
 
 
 (map (fn [x] {(key x) (val x)}) {2/3 [4 6], 1/2 [[[1 2] [2 4]] [3 6]]})
@@ -1979,3 +1958,6 @@
 (= 827 (__ "DCCCXXVII"))
 (= 3999 (__ "MMMCMXCIX"))
 (= 48 (__ "XLVIII"))
+
+
+
