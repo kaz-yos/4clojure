@@ -859,8 +859,21 @@
 
 ;; keys
 (defn __ [f s]
-  (let [ks (map f s)]
-    (map (fn [x] (zipmap [(first x)] [(last x)])) (partition 2 (interleave ks s)))))
+  (let [ks (map f s)
+        ;; 1-pair maps in a list
+        mp (map #(zipmap [(first %)] [(last %)]) (partition 2 (interleave ks s)))
+        ;; distinct keys in a list
+        ks2 (flatten (distinct (map keys mp)))
+        ]
+
+    (map ; loop over keys
+     (fn [k] (map ; loop over individual maps (used as a function)
+              (fn [m] (m k))
+              mp))
+     ks2)
+    ))
+
+
 
 
 (= (__ #(> % 5) [1 3 6 8]) {false [1 3], true [6 8]})
