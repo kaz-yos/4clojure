@@ -15,7 +15,7 @@
  5)
 
 
-;; 4Clojure Question 29
+;;; 4Clojure Question 29
 ;;
 ;; Write a function which takes a string and returns a new string containing only the capital letters.
 ;;
@@ -52,7 +52,7 @@
 
 
 
-;; 4Clojure Question 32
+;;; 4Clojure Question 32
 ;;
 ;; Write a function which duplicates each element of a sequence.
 ;;
@@ -75,7 +75,7 @@
 
 
 
-;; 4Clojure Question 48
+;;; 4Clojure Question 48
 ;;
 ;; The some function takes a predicate function and a collection.  It returns the first logical true value of (predicate x) where x is an item in the collection.
 ;;
@@ -89,7 +89,7 @@
 
 
 
-;; 4Clojure Question 34
+;;; 4Clojure Question 34
 ;;
 ;; Write a function which creates a list of all integers in a given range.
 ;;
@@ -119,7 +119,7 @@
 
 
 
-;; 4Clojure Question 28
+;;; 4Clojure Question 28
 ;;
 ;; Write a function which flattens a sequence.
 ;;
@@ -160,7 +160,7 @@
 
 
 
-;; 4Clojure Question 42
+;;; 4Clojure Question 42
 ;;
 ;; Write a function which calculates factorials.
 ;;
@@ -185,7 +185,7 @@
 
 
 
-;; 4Clojure Question 39
+;;; 4Clojure Question 39
 ;;
 ;; Write a function which takes two sequences and returns the first item from each, then the second item from each, then the third, etc.
 ;;
@@ -221,7 +221,7 @@
 
 
 
-;; 4Clojure Question 30
+;;; 4Clojure Question 30
 ;;
 ;; Write a function which removes consecutive duplicates from a sequence.
 ;;
@@ -242,7 +242,7 @@
 
 
 
-;; 4Clojure Question 47
+;;; 4Clojure Question 47
 ;;
 ;; The contains? function checks if a KEY is present in a given collection.  This often leads beginner clojurians to use it incorrectly with numerically indexed collections like vectors and lists.
 ;;
@@ -256,7 +256,7 @@
 
 
 
-;; 4Clojure Question 45
+;;; 4Clojure Question 45
 ;;
 ;; The iterate function can be used to produce an infinite lazy sequence.
 ;;
@@ -267,7 +267,7 @@
 
 
 
-;; 4Clojure Question 40
+;;; 4Clojure Question 40
 ;;
 ;; Write a function which separates the items of a sequence by an arbitrary value.
 ;;
@@ -291,7 +291,7 @@
 
 
 
-;; 4Clojure Question 31
+;;; 4Clojure Question 31
 ;;
 ;; Write a function which packs consecutive duplicates into sub-lists.
 ;;
@@ -306,7 +306,7 @@
 
 
 
-;; 4Clojure Question 41
+;;; 4Clojure Question 41
 ;;
 ;; Write a function which drops every Nth item from a sequence.
 ;;
@@ -372,7 +372,7 @@
 
 
 
-;; 4Clojure Question 52
+;;; 4Clojure Question 52
 ;;
 ;; Let bindings and function parameter lists support destructuring.
 ;;
@@ -382,7 +382,7 @@
            (vector c e)))
 
 
-;; 4Clojure Question 49
+;;; 4Clojure Question 49
 ;;
 ;; Write a function which will split a sequence into two parts.
 ;;
@@ -403,7 +403,7 @@
 
 
 
-;; 4Clojure Question 51
+;;; 4Clojure Question 51
 ;;
 ;; Here is an example of some more sophisticated destructuring.
 ;;
@@ -432,7 +432,7 @@
 
 
 
-;; 4Clojure Question 83
+;;; 4Clojure Question 83
 ;;
 ;; Write a function which takes a variable number of booleans.  Your function should return true if some of the parameters are true, but not all of the parameters are true.  Otherwise your function should return false.
 ;;
@@ -477,7 +477,7 @@
 
 
 
-;; 4Clojure Question 61
+;;; 4Clojure Question 61
 ;;
 ;; Write a function which takes a vector of keys and a vector of values and constructs a map from them.
 ;;
@@ -524,7 +524,7 @@
 
 
 
-;; 4Clojure Question 166
+;;; 4Clojure Question 166
 ;;
 ;; For any orderable data type it's possible to derive all of the basic comparison operations (&lt;, &le;, =, &ne;, &ge;, and &gt;) from a single operation (any operator but = or &ne; will work). Write a function that takes three arguments, a <var>less than</var> operator for the data and two items to compare. The function should return a keyword describing the relationship between the two items. The keywords for the relationship between <var>x</var> and <var>y</var> are as follows:
 ;;
@@ -556,7 +556,7 @@
 
 
 
-;; 4Clojure Question 81
+;;; 4Clojure Question 81
 ;;
 ;; Write a function which returns the intersection of two sets.  The intersection is the sub-set of items that each set has in common.
 ;;
@@ -597,7 +597,7 @@
 (= (__ #{:a :b :c :d} #{:c :e :a :f :d}) #{:a :c :d})
 
 
-;; 4Clojure Question 66
+;;; 4Clojure Question 66
 ;;
 ;; Given two integers, write a function which
 ;;
@@ -629,7 +629,7 @@
 
 
 
-;; 4Clojure Question 62
+;;; 4Clojure Question 62
 ;;
 ;; Given a side-effect free function f and an initial value x write a function which returns an infinite lazy sequence of x, (f x), (f (f x)), (f (f (f x))), etc.
 ;;
@@ -667,7 +667,7 @@
 
 
 
-;; 4Clojure Question 107
+;;; 4Clojure Question 107
 ;;
 ;; <p>Lexical scope and first-class functions are two of the most basic building blocks of a functional language like Clojure. When you combine the two together, you get something very powerful called <strong>lexical closures</strong>. With these, you can exercise a great deal of control over the lifetime of your local bindings, saving their values for use later, long after the code you're running now has finished.</p>
 ;;
@@ -698,7 +698,7 @@
 
 
 
-;; 4Clojure Question 99
+;;; 4Clojure Question 99
 ;;
 ;; Write a function which multiplies two numbers and returns the result as a sequence of its digits.
 ;;
@@ -738,7 +738,7 @@
         (map read-string (re-seq #"[\d.]+" input)))
 
 
-;; 4Clojure Question 90
+;;; 4Clojure Question 90
 ;;
 ;; Write a function which calculates the <a href="http://en.wikipedia.org/wiki/Cartesian_product"> Cartesian product</a> of two sets.
 ;;
@@ -768,7 +768,7 @@
 
 
 
-;; 4Clojure Question 63
+;;; 4Clojure Question 63
 ;;
 ;; Given a function f and a sequence s, write a function which returns a map.  The keys should be the values of f applied to each item in s.  The value at each key should be a vector of corresponding items in the order they appear in s.
 ;;
@@ -887,7 +887,7 @@
 
 
 
-;; 4Clojure Question 122
+;;; 4Clojure Question 122
 ;;
 ;; Convert a binary number, provided in the form of a string, to its numerical value.
 ;;
@@ -935,7 +935,7 @@
 
 
 
-;; 4Clojure Question 88
+;;; 4Clojure Question 88
 ;;
 ;; Write a function which returns the symmetric difference of two sets.  The symmetric difference is the set of items belonging to one but not both of the two sets.
 ;;
@@ -969,7 +969,7 @@
 
 
 
-;; 4Clojure Question 143
+;;; 4Clojure Question 143
 ;;
 ;; Create a function that computes the <a href="http://en.wikipedia.org/wiki/Dot_product#Definition">dot product</a> of two sequences. You may assume that the vectors will have the same length.
 ;;
@@ -992,7 +992,7 @@
 
 
 
-;; 4Clojure Question 120
+;;; 4Clojure Question 120
 ;;
 ;; Write a function which takes a collection of integers as an argument.  Return the count of how many elements are smaller than the sum of their squared component digits.  For example: 10 is larger than 1 squared plus 0 squared; whereas 15 is smaller than 1 squared plus 5 squared.
 ;;
@@ -1040,6 +1040,22 @@
          )
   )
 
+;; identity based method
+;; square 
+(defn sqr [x]
+  (* x x))
+
+(map #(sqr (Integer. (str (identity %)))) (str 15))
+
+(reduce + (map #(sqr (Integer. (str (identity %)))) (str 15)))
+
+(defn __ [s]
+  (let [sqr (fn [x] (* x x))
+        ]))
+
+
+
+
 (= 8 (__ (range 10)))
 (= 19 (__ (range 30)))
 (= 50 (__ (range 100)))
@@ -1047,7 +1063,7 @@
 
 
 
-;; 4Clojure Question 100
+;;; 4Clojure Question 100
 ;;
 ;; Write a function which calculates the <a href="http://en.wikipedia.org/wiki/Least_common_multiple">least common multiple</a>.  Your function should accept a variable number of positive integers or ratios.
 ;;
@@ -1133,7 +1149,7 @@
 
 
 
-;; 4Clojure Question 44
+;;; 4Clojure Question 44
 ;;
 ;; Write a function which can rotate a sequence in either direction.
 ;;
@@ -1222,7 +1238,7 @@
 
 
 
-;; 4Clojure Question 173
+;;; 4Clojure Question 173
 ;;
 ;; Sequential destructuring allows you to bind symbols to parts of sequential things (vectors, lists, seqs, etc.): <a href="http://clojure.org/special_forms#Special Forms--(let [bindings* ] exprs*)">(let [bindings* ] exprs*)</a>
 ;;
@@ -1244,7 +1260,7 @@
 
 
 
-;; 4Clojure Question 50
+;;; 4Clojure Question 50
 ;;
 ;; Write a function which takes a sequence consisting of items with different types and splits them up into a set of homogeneous sub-sequences. The internal order of each sub-sequence should be maintained, but the sub-sequences themselves can be returned in any order (this is why 'set' is used in the test cases).
 ;;
@@ -1267,7 +1283,7 @@
 
 
 
-;; 4Clojure Question 54
+;;; 4Clojure Question 54
 ;;
 ;; Write a function which returns a sequence of lists of x items each.  Lists of less than x items should not be returned.
 ;;
@@ -1288,7 +1304,7 @@
 
 
 
-;; 4Clojure Question 43
+;;; 4Clojure Question 43
 ;;
 ;; Write a function which reverses the interleave process into x number of subsequences.
 ;;
@@ -1353,7 +1369,7 @@
 
 
 
-;; 4Clojure Question 126
+;;; 4Clojure Question 126
 ;;
 ;; Enter a value which satisfies the following:
 ;;
@@ -1367,7 +1383,7 @@
 
 
 
-;; 4Clojure Question 118
+;;; 4Clojure Question 118
 ;;
 ;; <p>Map is one of the core elements of a functional programming language. Given a function <code>f</code> and an input sequence <code>s</code>, return a lazy sequence of <code>(f x)</code> for each element <code>x</code> in <code>s</code>.
 ;;
@@ -1420,7 +1436,7 @@
 
 
 
-;; 4Clojure Question 55
+;;; 4Clojure Question 55
 ;;
 ;; Write a function which returns a map containing the number of occurences of each distinct item in a sequence.
 ;;
@@ -1464,7 +1480,7 @@
 
 
 
-;; 4Clojure Question 56
+;;; 4Clojure Question 56
 ;;
 ;; Write a function which removes the duplicates from a sequence. Order of the items must be maintained.
 ;;
@@ -1489,7 +1505,7 @@
 
 
 
-;; 4Clojure Question 58
+;;; 4Clojure Question 58
 ;;
 ;; Write a function which allows you to create function compositions.  The parameter list should take a variable number of functions, and create a function applies them from right-to-left.
 ;;
@@ -1512,7 +1528,7 @@
 
 
 
-;; 4Clojure Question 135
+;;; 4Clojure Question 135
 ;;
 ;; Your friend Joe is always whining about Lisps using the prefix notation for math. Show him how you could easily write a function that does math using the infix notation. Is your favorite language that flexible, Joe?
 ;;
@@ -1564,7 +1580,7 @@
 
 
 
-;; 4Clojure Question 59
+;;; 4Clojure Question 59
 ;;
 ;; Take a set of functions and return a new function that takes a variable number of arguments and returns a sequence containing the result of applying each function left-to-right to the argument list.
 ;;
@@ -1591,7 +1607,7 @@
 
 
 
-;; 4Clojure Question 110
+;;; 4Clojure Question 110
 ;;
 ;; <p>Write a function that returns a lazy sequence of "pronunciations" of a sequence of numbers. A pronunciation of each element in the sequence consists of the number of repeating identical numbers and the number itself. For example, <code>[1 1]</code> is pronounced as <code>[2 1]</code> ("two ones"), which in turn is pronounced as <code>[1 2 1 1]</code> ("one two, one one").</p><p>Your function should accept an initial sequence of numbers, and return an infinite lazy sequence of pronunciations, each element being a pronunciation of the previous element.</p>
 ;;
@@ -1654,7 +1670,7 @@
 
 
 
-;; 4Clojure Question 147
+;;; 4Clojure Question 147
 ;;
 ;; <p>Write a function that, for any given input vector of numbers, returns an infinite lazy sequence of vectors, where each next one is constructed from the previous following the rules used in <a href="http://en.wikipedia.org/wiki/Pascal's_triangle">Pascal's Triangle</a>. For example, for [3 1 2], the next row is [3 4 3 2].</p>
 ;;
@@ -1724,7 +1740,7 @@
 
 
 
-;; 4Clojure Question 80
+;;; 4Clojure Question 80
 ;;
 ;; A number is "perfect" if the sum of its divisors equal the number itself.  6 is a perfect number because 1+2+3=6.  Write a function which returns true for perfect numbers and false otherwise.
 ;;
@@ -1746,7 +1762,7 @@
 (= (__ 8128) true)
 
 
-;; 4Clojure Question 97
+;;; 4Clojure Question 97
 ;;
 ;; <a href="http://en.wikipedia.org/wiki/Pascal%27s_triangle">Pascal's triangle</a> is a triangle of numbers computed using the following rules:<br/></br>- The first row is 1.</br>- Each successive row is computed by adding together adjacent numbers in the row above, and adding a 1 to the beginning and end of the row.<br/><br/>Write a function which returns the nth row of Pascal's Triangle.
 ;;
@@ -1778,7 +1794,7 @@
 
 
 
-;; 4Clojure Question 104
+;;; 4Clojure Question 104
 ;;
 ;; This is the inverse of <a href='92'>Problem 92</a>, but much easier. Given an integer smaller than 4000, return the corresponding roman numeral in uppercase, adhering to the <a href='http://www.numericana.com/answer/roman.htm#valid'>subtractive principle</a>.
 ;;
@@ -1820,7 +1836,7 @@
 
 
 
-;; 4Clojure Question 92
+;;; 4Clojure Question 92
 ;;
 ;; Roman numerals are easy to recognize, but not everyone knows all the rules necessary to work with them. Write a function to parse a Roman-numeral string and return the number it represents.
 ;;
@@ -1997,3 +2013,70 @@
 
 
 
+;;; 4Clojure Question 128
+;;
+;; <p>A standard American deck of playing cards has four suits - spades, hearts, diamonds, and clubs - and thirteen cards in each suit. Two is the lowest rank, followed by other integers up to ten; then the jack, queen, king, and ace.</p>
+;;
+;; 
+;;
+;; <p>It's convenient for humans to represent these cards as suit/rank pairs, such as H5 or DQ: the heart five and diamond queen respectively. But these forms are not convenient for programmers, so to write a card game you need some way to parse an input string into meaningful components. For purposes of determining rank, we will define the cards to be valued from 0 (the two) to 12 (the ace)</p>
+;;
+;; 
+;;
+;; <p>Write a function which converts (for example) the string "SJ" into a map of <code>{:suit :spade, :rank 9}</code>. A ten will always be represented with the single character "T", rather than the two characters "10".</p>
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(interleave (map str (range 2 10)) (range 0 10))
+
+(zipmap "DHCTJQKA" [:diamond :heart :club 8 9 10 11 12])
+(zipmap (map identity "23456789TJQKA") (range 13))
+(zipmap (seq "23456789TJQKA") (range 13))
+
+(defn __ [s]
+  (let [suit-letter (str (first s))
+        rank-letter (str (second s))
+        suits {"D" :diamond, "H" :heart, "C" :club, "S" :spade}
+        ranks {"2" 0 "3" 1 "4" 2 "5" 3 "6" 4 "7" 5 "8" 6 "9" 7 "T" 8 "J" 9 "Q" 10 "K" 11 "A" 12}]
+    ;;
+    {:suit (get suits suit-letter), :rank (get ranks rank-letter)}))
+
+(defn __ [s]
+  (let [suit-letter (first s)
+        rank-letter (second s)
+        suits {\D :diamond, \H :heart, \C :club, \S :spade}
+        ranks (zipmap (seq "23456789TJQKA") (range 13))]
+    ;;
+    {:suit (get suits suit-letter), :rank (get ranks rank-letter)}))
+
+
+(= {:suit :diamond :rank 10} (__ "DQ"))
+(= {:suit :heart :rank 3} (__ "H5"))
+(= {:suit :club :rank 12} (__ "CA"))
+(= (range 13) (map (comp :rank __ str)
+                   '[S2 S3 S4 S5 S6 S7
+                     S8 S9 ST SJ SQ SK SA]))
+
+
+
+
+;;; 4Clojure Question 96
+;;
+;; Let us define a binary tree as "symmetric" if the left half of the tree is the mirror image of the right half of the tree.  Write a predicate to determine whether or not a given binary tree is symmetric. (see <a href='/problem/95'>To Tree, or not to Tree</a> for a reminder on the tree representation we're using).
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+
+
+(= (__ '(:a (:b nil nil) (:b nil nil))) true)
+(= (__ '(:a (:b nil nil) nil)) false)
+(= (__ '(:a (:b nil nil) (:c nil nil))) false)
+(= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+          [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])
+   true)
+(= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+          [2 [3 nil [4 [5 nil nil] [6 nil nil]]] nil]])
+   false)
+(= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+          [2 [3 nil [4 [6 nil nil] nil]] nil]])
+   false)
