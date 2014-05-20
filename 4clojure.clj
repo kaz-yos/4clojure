@@ -845,6 +845,8 @@
 
 (apply merge-with list [{1 [1]} {2 [1 2]} {1 [3]} {3 [1 2 3]} {2 [2 3]}])
 
+(apply merge-with concat [{1 [1]} {2 [1 2]} {1 [3]} {3 [1 2 3]} {2 [2 3]}])
+
 (apply merge-with (comp list list) [{1 [1]} {2 [1 2]} {1 [3]} {3 [1 2 3]} {2 [2 3]}])
 
 (filter #(= 1 (keys %)) [{1 [1]} {2 [1 2]} {1 [3]} {3 [1 2 3]} {2 [2 3]}])
@@ -873,7 +875,36 @@
      ks2)
     ))
 
+;; reduce solution
+(def add-to-vector (fn [f map1 new-val]
+                     (let [key1 (f new-val)]
+                       (if (contains? map1 key1)
+                         ;; if already contained, add to vector
+                         (assoc map1 key1 (conj (key1 map1) new-val))
+                         ;; if not already contained, just add a vector
+                         (assoc map1 key1 [new-val])))))
 
+(add-to-vector #(> % 5) {} 2)
+(add-to-vector #(> % 5) {false [2]} 2)
+
+(defn __ [f s]
+  (let [add-to-vector (fn [map1 new-val]
+                        (let [key1 (f new-val)]
+                          (if (contains? map1 key1)
+                            ;; if already contained, add to vector
+                            (assoc map1 key1 (conj (get map1 key1) new-val))
+                            ;; if not already contained, just add a vector
+                            (assoc map1 key1 [new-val]))))]
+
+    (reduce add-to-vector {} s)))
+
+(defn __ [f s]
+  (apply merge-with concat (map #(hash-map (f %1) [%1]) s)))
+
+(defn __ [f s]
+  (apply merge-with concat (map (fn [x] (hash-map (f x) [x])) s)))
+
+(map #(hash-map (count %1) [%1]) [[1 2] [2 4] [4 6] [3 6]])
 
 
 (= (__ #(> % 5) [1 3 6 8]) {false [1 3], true [6 8]})
@@ -881,7 +912,6 @@
    {1/2 [[1 2] [2 4] [3 6]], 2/3 [[4 6]]})
 (= (__ count [[1] [1 2] [3] [1 2 3] [2 3]])
    {1 [[1] [3]], 2 [[1 2] [2 3]], 3 [[1 2 3]]})
-
 
 (group-by count [[1] [1 2] [3] [1 2 3] [2 3]])
 
@@ -1497,6 +1527,25 @@
 
 (__ [1 2 1 3 1 2 4])
 
+;; sig: seq -> seq
+;; purpose remove duplicates
+;; stub:
+;; (defn __ [s]
+;;   [nil nil nil])
+;;
+(defn __ [s]
+  (loop [sq   s
+         seen #{}
+         acc []]
+    (let [fst-sq (first sq)]
+      (cond
+       (empty? sq)             acc
+       ;; if it has been seen
+       (contains? seen fst-sq) (recur (rest sq) seen acc)
+       ;; if not, add to acc
+       :else                   (recur (rest sq) (conj seen fst-sq) (conj acc fst-sq))))))
+
+
 (= (__ [1 2 1 3 1 2 4]) [1 2 3 4])
 (= (__ [:a :a :b :b :c :c]) [:a :b :c])
 (= (__ '([2 4] [1 2] [1 3] [1 3])) '([2 4] [1 2] [1 3]))
@@ -1520,6 +1569,22 @@
 
 (defn __ [& funs]
   (apply comp funs))
+
+;; signature: funs-> fun
+;; purpose apply multiple functions right to left
+;; stub: 
+;; (defn __ [& funs]
+;;   (fn [x] :-))
+;;
+;; this works good for single argument functions
+(defn __ [& funs]
+  (loop [funs1 (reverse funs)
+         acc (fn [x] x)]
+    ;;
+    (if (empty? funs1)
+      acc
+      (recur (rest funs1) (fn [& x] ((first funs1) (apply acc x)))))))
+
 
 (= [3 2 1] ((__ rest reverse) [1 2 3 4]))
 (= 5 ((__ (partial + 3) second) [1 2 3 4]))
@@ -2148,4 +2213,76 @@
          #{'+ '* mapcat (comment mapcat)}
          #{(do) set contains? nil?}
          #{, , , #_, , empty?}})
+   false)
+
+
+
+
+;; 4Clojure Question 146
+;;
+;; <p>Because Clojure's <code>for</code> macro allows you to "walk" over multiple sequences in a nested fashion, it is excellent for transforming all sorts of sequences. If you don't want a sequence as your final output (say you want a map), you are often still best-off using <code>for</code>, because you can produce a sequence and feed it into a map, for example.</p>
+;;
+;; <p>For this problem, your goal is to "flatten" a map of hashmaps. Each key in your output map should be the "path"<sup>1</sup> that you would have to take in the original map to get to a value, so for example <code>{1 {2 3}}</code> should result in <code>{[1 2] 3}</code>. You only need to flatten one level of maps: if one of the values is a map, just leave it alone.</p>
+;;
+;; <p><sup>1</sup> That is, <code>(get-in original [k1 k2])</code> should be the same as <code>(get result [k1 k2])</code></p>
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(defn __ [s]
+  (for [x s]
+    x))
+
+(defn __ [s]
+  (for [x s
+        ;; k1 (first x)
+        y  (second x)
+        ;; k2 (keys y)
+        v (vals y)
+        ]
+    ;; [k1 k2 v]
+    ;; k1
+    v
+    ))
+
+(= (__ '{a {p 1, q 2}
+         b {m 3, n 4}})
+   '{[a p] 1, [a q] 2
+     [b m] 3, [b n] 4})
+(= (__ '{[1] {a b c d}
+         [2] {q r s t u v w x}})
+   '{[[1] a] b, [[1] c] d,
+     [[2] q] r, [[2] s] t,
+     [[2] u] v, [[2] w] x})
+(= (__ '{m {1 [a b c] 3 nil}})
+   '{[m 1] [a b c], [m 3] nil})
+
+
+
+;;; 4Clojure Question 95
+;;
+;; Write a predicate which checks whether or not a given sequence represents a <a href="http://en.wikipedia.org/wiki/Binary_tree">binary tree</a>.  Each node in the tree must have a value, a left child, and a right child.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(defn __ [tree1]
+  (if (not (= 3 (count tree1)))
+    false
+    (let [coll-nodes (filter coll? tree1)]
+      (if (empty? coll-nodes)
+        true
+        (map __ coll-nodes)))))
+
+(= (__ '(:a (:b nil nil) nil))
+   true)
+(= (__ '(:a (:b nil nil)))
+   false)
+(= (__ [1 nil [2 [3 nil nil] [4 nil nil]]])
+   true)
+(= (__ [1 [2 nil nil] [3 nil nil] [4 nil nil]])
+   false)
+(= (__ [1 [2 [3 [4 nil nil] nil] nil] nil])
+   true)
+(= (__ [1 [2 [3 [4 false nil] nil] nil] nil])
+   false)
+(= (__ '(:a nil ()))
    false)
