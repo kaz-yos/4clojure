@@ -1380,16 +1380,33 @@
     []
     (cons (f (first s)) (__ f (rest s)))))
 
+;; tail recursion
 (defn __ [f s]
   (loop [sq s
          acc []]
 
     (if (= 0 (count sq))
       acc
-      (recur (rest sq) (conj acc (f (first sq)))))
-    )
-  )
+      (recur (rest sq) (conj acc (f (first sq)))))))
 
+;; count changed to empty?
+(defn __ [f s]
+  (loop [sq s
+         acc []]
+
+    (if (empty? sq)
+      acc
+      (recur (rest sq) (conj acc (f (first sq)))))))
+
+;; reduce
+(defn __ [f s]
+  (reduce (fn [a b] (conj a (f b))) [] s))
+
+;; lazy
+(defn __ [f s]
+  (lazy-seq (reduce (fn [a b] (conj a (f b))) [] s)))
+
+;; conj realizes the sequence. Need to handle it as a lazy-seq
 
 
 (= [3 4 5 6 7]
