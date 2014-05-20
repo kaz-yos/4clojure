@@ -1586,6 +1586,24 @@
       (recur (rest funs1) (fn [& x] ((first funs1) (apply acc x)))))))
 
 
+;; only the very first function potentially takes multiple args
+(defn __ [& funs]
+  (loop [funs1 funs
+         acc identity] ; function acculators
+    ;;
+    (if (empty? (rest funs1))
+      ;; stop at the very last function (first to be applied)
+      ;; this one may take multiple args, use apply, and warp with acc
+      (fn [& x] (acc (apply (first funs1) x)))
+      ;; Insert each function inside the previous one
+      (recur (rest funs1) (fn [x] (acc ((first funs1) x)))))))
+
+;; reduce solutions.
+;; make the first exception by using the initial value
+(defn __ [& funs]
+  (fn [& x] (reduce (fn [v f] (f v)) (apply (last funs) x) (reverse (butlast funs)))))
+
+
 (= [3 2 1] ((__ rest reverse) [1 2 3 4]))
 (= 5 ((__ (partial + 3) second) [1 2 3 4]))
 (= true ((__ zero? #(mod % 8) +) 3 5 7 9))
