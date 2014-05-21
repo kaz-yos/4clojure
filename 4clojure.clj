@@ -2346,3 +2346,122 @@
    ["a" "Clojure" "fun" "is" "language"])
 (= (__  "Fools fall for foolish follies.")
    ["fall" "follies" "foolish" "Fools" "for"])
+
+
+
+;;; 4Clojure Question 76
+;;
+;; The trampoline function takes a function f and a variable number of parameters.  Trampoline calls f with any parameters that were supplied.  If f returns a function, trampoline calls that function with no arguments.  This is repeated, until the return value is not a function, and then trampoline returns that non-function value.  This is useful for implementing mutually recursive algorithms in a way that won't consume the stack.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(= __
+   (letfn
+     [(foo [x y] #(bar (conj x y) y))
+      (bar [x y] (if (> (last x) 10)
+                   x
+                   #(foo x (+ 2 y))))]
+     (trampoline foo [] 1)))
+
+
+(letfn
+    [(foo [x y] #(bar (conj x y) y))
+     (bar [x y] (if (> (last x) 10)
+                  x
+                  #(foo x (+ 2 y))))]
+  (trampoline foo [] 1))
+
+
+
+;;; 4Clojure Question 67
+;;
+;; Write a function which returns the first x
+;;
+;; number of prime numbers.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(defn __ [n]
+  (loop [lazy-num (drop 3 (range))
+         i         1
+         acc      [2]]
+    ;;
+    (cond
+     ;; if enough numbers have accumulated, return acc
+     (= i n) acc
+     ;; if current number is not divisible by all numbers in acc, it is a prime
+     (every? #((complement zero?) (rem (first lazy-num) %)) acc) (recur (rest lazy-num)
+                                                                        (inc i)
+                                                                        (conj acc (first lazy-num)))
+     ;; Otherwise, just move on
+     :else (recur (rest lazy-num) i acc))))
+
+(= (__ 2) [2 3])
+(= (__ 5) [2 3 5 7 11])
+(= (last (__ 100)) 541)
+
+
+
+;;; 4Clojure Question 74
+;;
+;; Given a string of comma separated integers, write a function which returns a new comma separated string that only contains the numbers which are perfect squares.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; sig: string -> string
+;; purpose keep only the perfect squares
+;; stub:
+;; (defn __ [s]
+;;   "0")
+;; 
+(defn __ [s]
+  (let [nums (map #(Integer/parseInt %) (clojure.string/split s #","))]
+    ;; Filter for perfect square, and then back to string
+    (->> nums
+         (filter #(zero? (mod (Math/sqrt %) 1)),  )
+         (interpose ","                        ,  )
+         (apply str                            ,  ))))
+
+(= (__ "4,5,6,7,8,9") "4,9")
+(= (__ "15,16,25,36,37") "16,25,36")
+
+
+
+;;; 4Clojure Question 69
+;;
+;; Write a function which takes a function f and a variable number of maps.  Your function should return a map that consists of the rest of the maps conj-ed onto the first.  If a key occurs in more than one map, the mapping(s) from the latter (left-to-right) should be combined with the mapping in the result by calling (f val-in-result val-in-latter)
+;;
+;; Restrictions (please don't use these function(s)): merge-with
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; sig: f maps -> map
+;; purpose merge with a function
+;; stub
+;; (defn __ [f & maps]
+;;   {})
+;;
+(defn __ [f & maps]
+  (let [my-merge-with (fn [f m1 m2]
+                        (loop [keys2 (keys m2)
+                               acc   m1]
+                          ;;
+                          (let [fst-keys2 (first keys2)]
+                            (cond
+                             ;; if all keys are worked on, return acc
+                             (empty? keys2) acc
+                             ;; If m1 has the same key, merge-with f
+                             (contains? m1 fst-keys2) (recur (rest keys2)
+                                                             (assoc acc fst-keys2(f (get m1 fst-keys2)
+                                                                                    (get m2 fst-keys2))))
+                             ;; If m1 has no such key, just merge
+                             :else (recur (rest keys2) (assoc acc fst-keys2 (get m2 fst-keys2)))))))]
+    
+    (reduce #(my-merge-with f %1 %2) (first maps) (rest maps))))
+
+(= (__ * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
+   {:a 4, :b 6, :c 20})
+(= (__ - {1 10, 2 20} {1 3, 2 10, 3 15})
+   {1 7, 2 10, 3 15})
+(= (__ concat {:a [3], :b [6]} {:a [4 5], :c [8 9]} {:b [7]})
+   {:a [3 4 5], :b [6 7], :c [8 9]})
