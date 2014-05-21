@@ -2304,3 +2304,45 @@
    false)
 (= (__ '(:a nil ()))
    false)
+
+
+
+
+;;; 4Clojure Question 70
+;;
+;; Write a function that splits a sentence up into a sorted list of words.  Capitalization should not affect sort order and punctuation should be ignored.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; sig: string -> seq of string
+;; purpose: sort words
+(defn __ [s]
+  (let [seq-strings       (->> (clojure.string/replace s #"[.!]" "")
+                               (#(clojure.string/split % #" "),  ))
+        ;; lower case
+        seq-strings-lower (map clojure.string/lower-case seq-strings)
+        ;; how they correspond
+        str-map           (zipmap seq-strings-lower seq-strings)]
+    ;; sort lower case ones, and map the originals
+    (map #(get str-map %) (sort seq-strings-lower))))
+
+;; heavy Java interop
+(defn __ [x] (sort-by #(.toLowerCase %) (.split (.replaceAll x "[^a-zA-Z ]" "") " ")))
+
+(.replaceAll "Have a nice day.!!!!" "[^a-zA-Z ]" "")
+(.split (.replaceAll "Have a nice day.!!!!" "[^a-zA-Z ]" "") " ")
+(sort-by #(.toLowerCase %) (.split (.replaceAll "Have a nice day.!!!!" "[^a-zA-Z ]" "") " "))
+
+;; sort-by
+(defn __ [s]
+  (let [seq-strings (->> (clojure.string/replace s #"[.!]" "")
+                         (#(clojure.string/split % #" "),  ))]
+    ;; sort by lower case representations
+    (sort-by #(clojure.string/lower-case %) seq-strings)))
+
+(= (__  "Have a nice day.")
+   ["a" "day" "Have" "nice"])
+(= (__  "Clojure is a fun language!")
+   ["a" "Clojure" "fun" "is" "language"])
+(= (__  "Fools fall for foolish follies.")
+   ["fall" "follies" "foolish" "Fools" "for"])
