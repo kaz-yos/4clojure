@@ -2481,11 +2481,29 @@
 ;;   #{})
 ;;
 (defn __ [aset]
-  (let [arange (range (inc (count aset)))]
-    (for [x aset
-          y (disj aset x)]
-      [x y])
+  ;; start with a set with an empty set
+  (loop [acc #{#{}}]    
+    (if (= (count aset) (first (max (map #(count %) acc))))
+      acc
+      (recur (flatten (for [x aset]
+               (map #(conj % x) acc)))))
     ))
+;; 
+;; http://rosettacode.org/wiki/Power_set#R
+(defn __ [aset]
+  ;; list of one element sets
+  (->> (let [one-elt-sets (map #(set [%]) (into [] aset))]
+         (loop [counter (count aset)
+                acc one-elt-sets]
+           ;;
+           (if (zero? counter)
+             acc
+             (recur (dec counter) (concat acc (flatten (for [x aset]
+                                                         (map #(conj % x) acc))))))))
+       (into #{},  )
+       (#(conj % #{}),  )
+       )
+  )
 
 (= (__ #{1 :a}) #{#{1 :a} #{:a} #{} #{1}})
 (= (__ #{}) #{#{}})
