@@ -2480,11 +2480,127 @@
 ;; (defn __ [a-set]
 ;;   #{})
 ;;
-(defn __ [a-set]
-  )
+(defn __ [aset]
+  (let [arange (range (inc (count aset)))]
+    (for [x aset
+          y (disj aset x)]
+      [x y])
+    ))
 
 (= (__ #{1 :a}) #{#{1 :a} #{:a} #{} #{1}})
 (= (__ #{}) #{#{}})
 (= (__ #{1 2 3})
    #{#{} #{1} #{2} #{3} #{1 2} #{1 3} #{2 3} #{1 2 3}})
 (= (count (__ (into #{} (range 10)))) 1024)
+
+
+
+
+
+;;; 4Clojure Question 73
+;;
+;; A <a href="http://en.wikipedia.org/wiki/Tic-tac-toe">tic-tac-toe</a> board is represented by a two dimensional vector. X is represented by :x, O is represented by :o, and empty is represented by :e.  A player wins by placing three Xs or three Os in a horizontal, vertical, or diagonal row.  Write a function which analyzes a tic-tac-toe board and returns :x if X has won, :o if O has won, and nil if neither player has won.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; sig: vector of vectors -> bool or nil
+;; purpose check the board for winning pattern
+;; stub
+;; (defn __ [board]
+;;   :nil)
+;;
+(def board1 [[:e :e :e]
+             [:e :e :e]
+             [:e :e :e]])
+(def board2 [[:x :e :o]
+             [:x :e :e]
+             [:x :e :o]])
+(def board3 [[:e :x :e]
+             [:o :o :o]
+             [:x :e :x]])
+(def board4 [[:x :e :e]
+             [:o :x :e]
+             [:o :e :x]])
+(defn row [board]
+  (let [row-value-set (set (filter #(= 1 (count %)) (map (fn [x] (distinct x)) board)))]
+    (cond
+     (contains? row-value-set '(:o)) :o
+     (contains? row-value-set '(:x)) :x
+     :else                           nil)))
+(row board1) ; none
+(row board2) ; col win
+(row board3) ; row win
+
+
+(defn col [board]
+  (let [board-transposed (apply map vector board)]
+    (row board-transposed)))
+(col board1) ; none
+(col board2) ; col win
+(col board3) ; row win
+
+(defn diag [board]
+  (let [diag1 [(get-in board [0 0])
+               (get-in board [1 1])
+               (get-in board [2 2])]
+        diag2 [(get-in board [0 2])
+               (get-in board [1 1])
+               (get-in board [2 0])]]
+    (row [diag1 diag2])))
+(diag board4)
+;;
+;; Using named functions
+(defn __ [board]
+  (let [row (row board)
+        col (col board)
+        diag (diag board)]
+    (first (filter (complement nil?) [row col diag]))))
+;;
+
+(defn __ [board]
+  ;; define a function for row assessment
+  (let [row-fun (fn [board]
+                  (let [row-value-set (set (filter #(= 1 (count %)) (map (fn [x] (distinct x)) board)))]
+                    (cond
+                     (contains? row-value-set '(:o)) :o
+                     (contains? row-value-set '(:x)) :x
+                     :else                           nil)))
+        ;; Get values for each one rows, cols, and diags using row-fun
+        row  (row-fun board)
+        col  (row-fun (apply map vector board))
+        diag (let [diag1 [(get-in board [0 0])
+                          (get-in board [1 1])
+                          (get-in board [2 2])]
+                   diag2 [(get-in board [0 2])
+                          (get-in board [1 1])
+                          (get-in board [2 0])]]
+               (row-fun [diag1 diag2]))]
+    ;; Check for non-nil values, (first '()) will result in nil
+    (first (filter (complement nil?) [row col diag]))))
+;;
+;; as one function
+
+
+;;
+
+(= nil (__ [[:e :e :e]
+            [:e :e :e]
+            [:e :e :e]]))
+(= :x (__ [[:x :e :o]
+           [:x :e :e]
+           [:x :e :o]]))
+(= :o (__ [[:e :x :e]
+           [:o :o :o]
+           [:x :e :x]]))
+(= nil (__ [[:x :e :o]
+            [:x :x :e]
+            [:o :x :o]]))
+(= :x (__ [[:x :e :e]
+           [:o :x :e]
+           [:o :e :x]]))
+(= :o (__ [[:x :e :o]
+           [:x :o :e]
+           [:o :e :x]]))
+(= nil (__ [[:x :o :x]
+            [:x :o :x]
+            [:o :x :o]]))
