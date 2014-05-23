@@ -1071,7 +1071,7 @@
   )
 
 ;; identity based method
-;; square 
+;; square
 (defn sqr [x]
   (* x x))
 
@@ -1572,7 +1572,7 @@
 
 ;; signature: funs-> fun
 ;; purpose apply multiple functions right to left
-;; stub: 
+;; stub:
 ;; (defn __ [& funs]
 ;;   (fn [x] :-))
 ;;
@@ -1892,7 +1892,7 @@
          r   ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"]
          n1  n
          acc ""]
-    
+
     (if (= 0 (count d))
       ;; if the digits are exhausted
       acc
@@ -1900,7 +1900,7 @@
       (let [div   (first d)
             times (quot n1 div) ; how many divisors are contained
             remdr (rem  n1 div)]; reminder for next iteration
-        
+
         (recur (rest d) (rest r) remdr (str acc (apply str (repeat times (first r)))))))))
 
 ;; using a builtin function
@@ -2072,7 +2072,7 @@
              (+ acc (* (count (re-seq (first r) s)) (first n)))))))
 (__ "MMMCMXCIX")
 
-;; 
+;;
 (defn __ [x]
   (let
     [R {\I 1, \V 5, \X 10, \L 50, \C 100, \D 500, \M 1000}]
@@ -2100,11 +2100,11 @@
 ;;
 ;; <p>A standard American deck of playing cards has four suits - spades, hearts, diamonds, and clubs - and thirteen cards in each suit. Two is the lowest rank, followed by other integers up to ten; then the jack, queen, king, and ace.</p>
 ;;
-;; 
+;;
 ;;
 ;; <p>It's convenient for humans to represent these cards as suit/rank pairs, such as H5 or DQ: the heart five and diamond queen respectively. But these forms are not convenient for programmers, so to write a card game you need some way to parse an input string into meaningful components. For purposes of determining rank, we will define the cards to be valued from 0 (the two) to 12 (the ace)</p>
 ;;
-;; 
+;;
 ;;
 ;; <p>Write a function which converts (for example) the string "SJ" into a map of <code>{:suit :spade, :rank 9}</code>. A ten will always be represented with the single character "T", rather than the two characters "10".</p>
 ;;
@@ -2169,11 +2169,11 @@
 
 ;;; 4Clojure Question 153
 ;;
-;; Given a set of sets, create a function which returns <code>true</code> 
+;; Given a set of sets, create a function which returns <code>true</code>
 ;;
-;; if no two of those sets have any elements in common<sup>1</sup> and <code>false</code> otherwise. 
+;; if no two of those sets have any elements in common<sup>1</sup> and <code>false</code> otherwise.
 ;;
-;; Some of the test cases are a bit tricky, so pay a little more attention to them. 
+;; Some of the test cases are a bit tricky, so pay a little more attention to them.
 ;; <sup>1</sup>Such sets are usually called <i>pairwise disjoint</i> or <i>mutually disjoint</i>.
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
@@ -2413,7 +2413,7 @@
 ;; stub:
 ;; (defn __ [s]
 ;;   "0")
-;; 
+;;
 (defn __ [s]
   (let [nums (map #(Integer/parseInt %) (clojure.string/split s #","))]
     ;; Filter for perfect square, and then back to string
@@ -2456,7 +2456,7 @@
                                                                                     (get m2 fst-keys2))))
                              ;; If m1 has no such key, just merge
                              :else (recur (rest keys2) (assoc acc fst-keys2 (get m2 fst-keys2)))))))]
-    
+
     (reduce #(my-merge-with f %1 %2) (first maps) (rest maps))))
 
 (= (__ * {:a 2, :b 3, :c 4} {:a 2} {:b 2} {:c 5})
@@ -2481,20 +2481,21 @@
 ;;   #{})
 ;;
 ;; http://rosettacode.org/wiki/Power_set#R
-(defn __ [aset]  
+(defn __ [aset]
   (->> (loop [;; count down from the number of elements in aset
               counter (count aset)
               ;; acc start as list of an empty set
-              acc '(#{})]
-         ;; stop and return acc 
+              acc #{#{}}]
+         ;; stop and return acc
          (if (zero? counter)
            acc
-           (recur (dec counter) (concat acc
-                                        ;; Add to acc, all possible one element addition to acc elements
-                                        ;; like (#{1} #{:a}) -> (#{1 1} #{:a 1} #{1 :a} #{:a :a})
-                                        ;; duplications are removed
-                                        (flatten (for [x aset]
-                                                   (map #(conj % x) acc)))))))
+           (recur (dec counter) (set ; make acc a set to reduce the number of elements
+                                 (concat acc
+                                         ;; Add to acc, all possible one element addition to acc elements
+                                         ;; like (#{1} #{:a}) -> (#{1 1} #{:a 1} #{1 :a} #{:a :a})
+                                         ;; duplications are removed
+                                         (flatten (for [x aset]
+                                                    (map #(conj % x) acc))))))))
        ;; Put elements after the recursion into a set
        (into #{},  )))
 
