@@ -2480,30 +2480,26 @@
 ;; (defn __ [a-set]
 ;;   #{})
 ;;
-(defn __ [aset]
-  ;; start with a set with an empty set
-  (loop [acc #{#{}}]    
-    (if (= (count aset) (first (max (map #(count %) acc))))
-      acc
-      (recur (flatten (for [x aset]
-               (map #(conj % x) acc)))))
-    ))
-;; 
 ;; http://rosettacode.org/wiki/Power_set#R
-(defn __ [aset]
-  ;; list of one element sets
-  (->> (let [one-elt-sets (map #(set [%]) (into [] aset))]
-         (loop [counter (count aset)
-                acc one-elt-sets]
-           ;;
-           (if (zero? counter)
-             acc
-             (recur (dec counter) (concat acc (flatten (for [x aset]
-                                                         (map #(conj % x) acc))))))))
+(defn __ [aset]  
+  (->> (loop [;; count down from the number of elements in aset
+              counter (count aset)
+              ;; acc start as list of one element sets
+              acc (map #(set [%]) (into [] aset))]
+         ;; stop and return acc 
+         (if (zero? counter)
+           acc
+           (recur (dec counter) (concat acc
+                                        ;; Add to acc, all possible one element addition to acc elements
+                                        ;; (#{1} #{:a}) -> (#{1 1} #{:a 1} #{1 :a} #{:a :a})
+                                        ;; duplications are removed
+                                        (flatten (for [x aset]
+                                                   (map #(conj % x) acc)))))))
+       ;; Put elements after the recursion into a set
        (into #{},  )
-       (#(conj % #{}),  )
-       )
-  )
+       ;; Add the empty element
+       (#(conj % #{}),  )))
+
 
 (= (__ #{1 :a}) #{#{1 :a} #{:a} #{} #{1}})
 (= (__ #{}) #{#{}})
