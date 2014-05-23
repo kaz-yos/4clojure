@@ -2484,21 +2484,19 @@
 (defn __ [aset]  
   (->> (loop [;; count down from the number of elements in aset
               counter (count aset)
-              ;; acc start as list of one element sets
-              acc (map #(set [%]) (into [] aset))]
+              ;; acc start as list of an empty set
+              acc '(#{})]
          ;; stop and return acc 
          (if (zero? counter)
            acc
            (recur (dec counter) (concat acc
                                         ;; Add to acc, all possible one element addition to acc elements
-                                        ;; (#{1} #{:a}) -> (#{1 1} #{:a 1} #{1 :a} #{:a :a})
+                                        ;; like (#{1} #{:a}) -> (#{1 1} #{:a 1} #{1 :a} #{:a :a})
                                         ;; duplications are removed
                                         (flatten (for [x aset]
                                                    (map #(conj % x) acc)))))))
        ;; Put elements after the recursion into a set
-       (into #{},  )
-       ;; Add the empty element
-       (#(conj % #{}),  )))
+       (into #{},  )))
 
 
 (= (__ #{1 :a}) #{#{1 :a} #{:a} #{} #{1}})
