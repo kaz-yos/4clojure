@@ -2507,6 +2507,26 @@
 (= (count (__ (into #{} (range 10)))) 1024)
 
 
+;; http://rosettacode.org/wiki/Power_set#Clojure
+(defn powerset
+  [coll]
+  (reduce
+   ;; This function is used for each element in coll
+   (fn [a  ; set of sets to add to
+        x] ; element from coll
+     (->> a
+          ;; concatenate element x with each elemental set within a (return as a set)
+          (map #(set (concat #{x} %)) ,  )
+          ;; add to the original set of sets
+          (concat a                   ,  )
+          ;; make everything a set
+          (set                        ,  )))
+   ;; initial value for reduce
+   #{#{}}
+   ;; collection to work on
+   coll))
+
+(powerset #{1 2 3})
 
 
 
@@ -2617,3 +2637,48 @@
 (= nil (__ [[:x :o :x]
             [:x :o :x]
             [:o :x :o]]))
+
+
+
+
+
+;;; 4Clojure Question 115
+;;
+;; A balanced number is one whose component digits have the same sum on the left and right halves of the number.  Write a function which accepts an integer n, and returns true iff n is balanced.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+;;
+;; sig: number -> bool
+;; purpose check for balancing
+;; stub:
+;; (defn __ [n]
+;;   nil)
+;;
+(defn __ [n]
+  (let [n-as-str    (str n)
+        half-length (quot (count n-as-str) 2)
+        left        (map str (take half-length n-as-str))
+        right       (map str (take half-length (reverse n-as-str)))
+        sum-as-int  (fn [sq] (reduce + (map #(Integer/parseInt %) sq)))]
+    ;;
+    (= (sum-as-int left) (sum-as-int right))))
+
+;; take-last is available
+(defn __ [n]
+  (let [n-as-str    (str n)
+        half-length (quot (count n-as-str) 2)
+        left        (map str (take      half-length n-as-str))
+        right       (map str (take-last half-length n-as-str))
+        sum-as-int  (fn [sq] (reduce + (map #(Integer/parseInt %) sq)))]
+    ;;
+    (= (sum-as-int left) (sum-as-int right))))
+;;
+(= true (__ 11))
+(= true (__ 121))
+(= false (__ 123))
+(= true (__ 0))
+(= false (__ 88099))
+(= true (__ 89098))
+(= true (__ 89089))
+(= (take 20 (filter __ (range)))
+   [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101])
