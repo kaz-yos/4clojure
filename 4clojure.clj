@@ -2682,3 +2682,57 @@
 (= true (__ 89089))
 (= (take 20 (filter __ (range)))
    [0 1 2 3 4 5 6 7 8 9 11 22 33 44 55 66 77 88 99 101])
+
+
+
+
+
+;;; 4Clojure Question 137
+;;
+;; Write a function which returns a sequence of digits of a non-negative number (first argument) in numerical system with an arbitrary base (second argument). Digits should be represented with their integer values, e.g. 15 would be [1 5] in base 10, [1 1 1 1] in base 2 and [15] in base 16.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+;; sig: number, number -> vector
+;; purpose create a number in base x
+;; stub:
+;; (defn __ [n base]
+;;   [0 0 0])
+;;
+(defn __ [n base]
+  (if (zero? n)
+    [0]
+    ;; obtain the largest base^x that is smaller than n
+    (let [max-possible-divisor (loop [div 1]
+                                 (cond
+                                  (= n div) div         ; necessary for (__ 8 8) etc
+                                  (< n div) (/ div base)
+                                  :else     (recur (* div base))))]
+      ;;
+      (loop [div       max-possible-divisor ; start from the biggest
+             remaining n
+             acc       []]
+        (if (and (< div 1))
+          acc
+          (recur (/ div base) (- remaining (* div (quot remaining div))) (conj acc (quot remaining div))))))))
+;;
+;; 0x89's solution:
+;; start from divisor base, the divide the quotient by base (next step), ...
+(defn it
+  ;; body 1
+  ([n base] (it n base []))
+  ;; body 2 for tail recursion
+  ([n base res]
+     (let [q    (quot n base)
+           r    (rem  n base)
+           nres (cons r res)]
+       ;;
+       (if (zero? q)
+         nres
+         (recur q base nres)))))
+
+;;
+(= [1 2 3 4 5 0 1] (__ 1234501 10))
+(= [0] (__ 0 11))
+(= [1 0 0 1] (__ 9 2))
+(= [1 0] (let [n (rand-int 100000)](__ n n)))
+(= [16 18 5 24 15 1] (__ Integer/MAX_VALUE 42))
