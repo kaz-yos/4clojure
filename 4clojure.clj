@@ -1099,76 +1099,37 @@
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
 
-(defn __ [a b]
-  (let [infseq (iterate inc 1)
-        rem-a (rem infseq a)
-        rem-b (rem infseq b)]
+(defn __ [& args]
+  (let [inf-seq    (iterate inc 1)
+        ;; number of args
+        n-args     (count args)
+        ;; Sequence of groups of n-th elements from each number's multiples
+        seq-groups (map (fn [x] (map #(* x %) args)) inf-seq)]
+    ;;
+    (loop [sq  (rest  seq-groups)
+           acc (first seq-groups)]
+      ;; check for non-unique values (max frequency = n-args)
+      (if (= (apply max (vals (frequencies acc))) n-args)
+        ;; if met, 
+        (->> (frequencies acc)
+             ;; pick the [k v] with v = n-args
+             (filter #(= (val %) n-args),  )
+             first  ; get [k v]
+             first) ; get k
+        ;;
+        ;; if not met, recur
+        (recur (rest sq) (concat acc (first sq)))))))
 
-    (filter (fn [x] (and (= 0 rem-a)
-                         (= 0 rem-b)))
-            infseq)
-    ))
+;; pcl
+(defn __ [& xs]
+  (/ (apply * xs)
+     
+     (reduce #(if (zero? %2)
+                %
+                (recur %2 (mod % %2)))
+             ;;
+             xs)))
 
-
-(defn __ [a b]
-  (let [infseq (iterate inc 1)]
-
-    (filter (fn [x] (and (integer? (/ x a))
-                         (integer? (/ x b))))
-            infseq)
-    ))
-(__ 2 3)
-
-(defn __ [& rest]
-  (let [infseq (iterate inc 1)]
-
-    (filter (fn [x] (every?
-                     #(integer? (/ x %))
-                     rest
-                     ))
-            infseq)
-    ))
-(__ 2 3)
-(__ 5 3 7)
-
-(defn __ [& rest]
-  (let [inf-s (iterate inc 1)]
-
-    (first (filter (fn [x] (every?
-                            #(integer? (/ x %))
-                            rest
-                            ))
-                   inf-s))
-    ))
-(__ 2 3)
-(__ 5 3 7)
-(__ 3/4 1/6)
-
-
-(defn __ [& rest]
-  (let [inf-s (iterate inc 1)
-        ]
-
-    (first (filter (fn [x] (every?
-                            #(= 0 (rem x %))
-                            rest
-                            ))
-                   inf-s))
-    ))
-
-;; this is not looking for 3/2
-(filter (fn [x] (every?
-                 #(= 0 (rem x %))
-                 [3/4 1/6]
-                 ))
-        (iterate inc 1))
-(rem 3/2 3/4)
-(denominator 3/2)
-(denominator 5)
-
-(__ 2 3)
-(__ 5 3 7)
-(__ 3/4 1/6)
 
 (== (__ 2 3) 6)
 (== (__ 5 3 7) 105)
@@ -1421,38 +1382,44 @@
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
 
-(defn __ [f s]
-  (if (= 0 (count s))
-    []
-    (cons (f (first s)) (__ f (rest s)))))
-
-;; tail recursion
-(defn __ [f s]
-  (loop [sq s
-         acc []]
-
-    (if (= 0 (count sq))
-      acc
-      (recur (rest sq) (conj acc (f (first sq)))))))
-
-;; count changed to empty?
-(defn __ [f s]
-  (loop [sq s
-         acc []]
-
-    (if (empty? sq)
-      acc
-      (recur (rest sq) (conj acc (f (first sq)))))))
-
-;; reduce
+;; reduce causes realization
 (defn __ [f s]
   (reduce (fn [a b] (conj a (f b))) [] s))
 
-;; lazy
+;; reduction is lazy
 (defn __ [f s]
-  (lazy-seq (reduce (fn [a b] (conj a (f b))) [] s)))
+  (reductions (fn [a b] (conj a (f b))) [] s))
+(__ inc [2 3 4 5 6])
 
-;; conj realizes the sequence. Need to handle it as a lazy-seq
+;; map definition
+(defn __ [f coll]
+  (lazy-seq
+   (when-let [s (seq coll)]
+     (if (chunked-seq? s)
+       ;; if chunked
+       (let [c (chunk-first s)
+             size (int (count c))
+             b (chunk-buffer size)]
+         (dotimes [i size]
+           (chunk-append b (f (.nth c i))))
+         (chunk-cons (chunk b) (__ f (chunk-rest s))))
+       ;; if not chunked
+       (cons (f (first s)) (__ f (rest s)))))))
+
+;; minimum based on map definition
+(defn __ [f coll]
+  ;; without lazy-seq stack overflow occurs
+  (lazy-seq
+   ;; until empty coll is bound to s
+   (when-let [s (seq coll)]
+     ;; apply f to the first element, recur with the rest
+     (cons (f (first s)) (__ f (rest s))))))
+
+;; aceeca1's solution:
+;; reduction discarding %1 is basically the same as the first reduce example
+;; need to give nil as a initial value and discard f(nil) by rest
+(defn __ [f x] (rest (reductions #(f %2) nil x)))
+
 
 
 (= [3 4 5 6 7]
@@ -2736,3 +2703,41 @@
 (= [1 0 0 1] (__ 9 2))
 (= [1 0] (let [n (rand-int 100000)](__ n n)))
 (= [16 18 5 24 15 1] (__ Integer/MAX_VALUE 42))
+
+
+
+;; 4Clojure Question 105
+;;
+;; Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword, and the value is a sequence of all the numbers (if any) between it and the next keyword in the sequence.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+;; sig: vector -> map
+;; purpose transform a vector with keys and values to a map
+;; stub:
+;; (defn __ [v]
+;;   {:nil nil})
+;;
+(defn __ [v]
+  (loop [vector1 v
+         map-all {}
+         map-cur {}]
+    (cond
+     ;; if nothing left return map-all after merging map-cur
+     (empty? vector1) (conj map-all map-cur)
+     ;; if a keyword is encountered, conj map-cur to map-all, and create a new map
+     (keyword? (first vector1)) (recur (rest vector1)
+                                       (conj map-all map-cur)
+                                       (hash-map (first vector1) []))
+     ;; Otherwise, keep map-all as is, update map-cur by adding new element to a vector
+     :else (recur (rest vector1)
+                  map-all
+                  (hash-map (first (keys map-cur)) (conj (first (vals map-cur)) (first vector1)))))))
+;;
+;;
+(partition-by keyword? [:a 1 2 3 :b :c 4])
+(split-with keyword? [:a 1 2 3 :b :c 4])
+
+(= {} (__ []))
+(= {:a [1]} (__ [:a 1]))
+(= {:a [1], :b [2]} (__ [:a 1, :b 2]))
+(= {:a [1 2 3], :b [], :c [4]} (__ [:a 1 2 3 :b :c 4]))
