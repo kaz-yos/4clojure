@@ -2116,7 +2116,55 @@
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
 
+;; divide at level 1, recursively sort, and compare after sorting?
+[1
+ [2
+  nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+ [2
+  nil [3 [4 [5 nil nil] [6 nil nil]] nil]]]
 
+
+(def tree-sort (fn tree-sort [x]
+                 (cond
+                  ;; leave terminal node alone
+                  ((complement coll?) x) [x]
+                  ;; if it is a collection node, with terminals only, sort it
+                  (and (coll? x) (every? (complement coll?) x)) (sort x)
+                  ;; Otherwise recur
+                  :else (for [node     x
+                              solution [(tree-sort node)]]
+                          solution))))
+
+(tree-sort '(:a (:b nil nil) (:b nil nil)))
+(tree-sort '(1 [:b nil nil] [[:c nil nil] nil]))
+(tree-sort [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+            [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])
+(sort-by #(first %) [[4] [6 nil nil] [5 nil nil]])
+
+;; sig: seq of seq -> bool
+;; purpose check for symmetry
+;;
+;; (defn __ [tree]
+;;   nil)
+;;
+(defn __ [tree]
+  (let [a (second tree)
+        b (last   tree)
+        ;; recuring function
+        tree-sort (fn tree-sort [x]
+                 (cond
+                  ;; leave terminal node alone
+                  ((complement coll?) x) x
+                  ;; if it is a collection node, with terminals only, sort it
+                  (and (coll? x) (every? (complement coll?) x)) (sort x)
+                  ;; Otherwise recur
+                  :else (for [node     x
+                              solution [(tree-sort node)]]
+                          solution)))]
+    ;;
+    (= (tree-sort a) (tree-sort b))
+    ))
+;;
 
 (= (__ '(:a (:b nil nil) (:b nil nil))) true)
 (= (__ '(:a (:b nil nil) nil)) false)
@@ -2213,21 +2261,25 @@
 ;;
 ;; Use M-x 4clojure-check-answers when you're done!
 
-(defn __ [s]
-  (for [x s]
-    x))
+;; sig: map -> map
+;; purpose: flatten a map with a sequential key
 
-(defn __ [s]
-  (for [x s
-        ;; k1 (first x)
-        y  (second x)
-        ;; k2 (keys y)
-        v (vals y)
-        ]
-    ;; [k1 k2 v]
-    ;; k1
-    v
-    ))
+(defn __
+  ;; body 1: user function
+  ([amap] (reduce merge (__ amap [])))
+  ;; body 2: helper function
+  ([amap acc]
+     (cond
+      ;; if it is not a map, return it                      ; this vector is opened up by solution binding
+      (not (= (type amap) clojure.lang.PersistentArrayMap)) [(zipmap [acc] [amap])]
+      ;;
+      :else (for [node     amap
+                  solution (__ (val node) (conj acc (key node)))]
+              ;; 
+              solution))))
+
+;; (zipmap [k1 k2 k3] [v1 v2 v3])
+(reduce #(merge %1 %2) (map #(zipmap [(first %)] [(second %)]) '([[a p] 1] [[a q] 2] [[b m] 3] [[b n] 4])))
 
 (= (__ '{a {p 1, q 2}
          b {m 3, n 4}})
@@ -2241,6 +2293,14 @@
 (= (__ '{m {1 [a b c] 3 nil}})
    '{[m 1] [a b c], [m 3] nil})
 
+(defn __ [x] (into {}
+                   (for 
+                       [[k v] x
+                        [k2 v2] v]
+                     [[k k2] v2])))
+
+(__ '{a {p 1, q 2}
+      b {m {3 2}, n 4}})
 
 
 ;;; 4Clojure Question 95
