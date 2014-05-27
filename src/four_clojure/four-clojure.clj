@@ -5,7 +5,7 @@
 
 
 ;;; https://www.4clojure.com/problem/71
-;;; -> macro for rearranging functions in reverse order
+;; -> macro for rearranging functions in reverse order
 (=
  ;; usual method
  (last (sort (rest (reverse [2 5 4 1 3 6]))))
