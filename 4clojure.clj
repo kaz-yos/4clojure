@@ -2263,22 +2263,24 @@
 
 ;; sig: map -> map
 ;; purpose: flatten a map with a sequential key
-
+;; This recursive version is not restricted to two levels
 (defn __
-  ;; body 1: user function
+  ;; body 1: user function (merge seq of maps; only worked here)
   ([amap] (reduce merge (__ amap [])))
   ;; body 2: helper function
   ([amap acc]
      (cond
       ;; if it is not a map, return it                      ; this vector is opened up by solution binding
-      (not (= (type amap) clojure.lang.PersistentArrayMap)) [(zipmap [acc] [amap])]
+      (not (= (type amap) clojure.lang.PersistentArrayMap)) [(hash-map acc amap)]
       ;;
       :else (for [node     amap
                   solution (__ (val node) (conj acc (key node)))]
               ;; 
               solution))))
 
+
 ;; (zipmap [k1 k2 k3] [v1 v2 v3])
+;; (hash-map k1 v1 k2 v2)
 (reduce #(merge %1 %2) (map #(zipmap [(first %)] [(second %)]) '([[a p] 1] [[a q] 2] [[b m] 3] [[b n] 4])))
 
 (= (__ '{a {p 1, q 2}
