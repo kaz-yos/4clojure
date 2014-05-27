@@ -2203,7 +2203,7 @@
 
 
 
-;; 4Clojure Question 146
+;;; 4Clojure Question 146
 ;;
 ;; <p>Because Clojure's <code>for</code> macro allows you to "walk" over multiple sequences in a nested fashion, it is excellent for transforming all sorts of sequences. If you don't want a sequence as your final output (say you want a map), you are often still best-off using <code>for</code>, because you can produce a sequence and feed it into a map, for example.</p>
 ;;
@@ -2256,6 +2256,76 @@
       (if (empty? coll-nodes)
         true
         (map __ coll-nodes)))))
+
+;; for macro and recursion
+(defn __ [tree1]
+  (if (not (and
+            ;; has three elements
+            (= 3 (count tree1))
+            ;; AND the first one is not a collection
+            ((complement coll?) (first tree1))))
+    ;; if either is not met
+    [false]
+    ;; if both are met, check if terminal (all elements are not collection)
+    (if (every? (complement coll?) tree1)
+      ;; if it is terminal
+      [true]
+      ;;
+      ;; otherwise, pick one solution to follow
+      (for [coll-node (filter coll? tree1)
+            solution  (__ coll-node)]
+        solution))))
+
+;; for macro and recursion
+(defn __ [tree]
+  (cond
+   ;; if not three element, bad
+   (not= 3 (count tree)) [false]
+   ;; if first is collection, bad
+   (coll? (first tree))  [false]
+   ;; if remaing two are not collection or nil, bad
+   (some (fn [x] (not (or (nil? x) (coll? x)))) (rest tree)) [false]
+   ;; if remaining two are both nil, good
+   (every? (fn [x] (nil? x)) (rest tree)) [true]
+   ;;
+   ;; Otherwise, check for collection nodes
+   :else (for [node     (filter coll? (rest tree))
+               solution (__ node)]
+           solution)))
+
+
+;; accumulator
+(defn __
+  ([tree] (every? identity (__ tree '())))
+  ;;
+  ([tree acc] (cond
+               ;; if not three element, bad
+               (not= 3 (count tree)) '(false)
+               ;; if first is collection, bad
+               (coll? (first tree))  '(false)
+               ;; if remaing two are not collection or nil, bad
+               (some (fn [x] (not (or (nil? x) (coll? x)))) (rest tree)) '(false)
+               ;; if remaining two are both nil, good
+               (every? (fn [x] (nil? x)) (rest tree)) '(true)
+               ;;
+               ;; Otherwise, check for collection nodes
+               :else (for [node     (filter coll? (rest tree))
+                           solution (__ node (conj acc true))]
+                       solution))))
+
+;; 0x89's solution:
+(defn tree? [x]
+  (or
+   ;; a node has to be nil
+   (nil? x)
+   ;; or all of these
+   (and
+    (sequential? x)
+    (= 3 (count x)) 
+    (not (sequential? (first x))) ; first element is not sequence
+    (tree? (second x)) ; 2nd element is also meet these criteria
+    (tree? (nth x 2))  ; 3rd element is also meet these criteria
+    )))
 
 (= (__ '(:a (:b nil nil) nil))
    true)
