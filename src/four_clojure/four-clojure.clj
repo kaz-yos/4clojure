@@ -3373,3 +3373,91 @@
              (fn [b]
                (* a b))))
        5 5))
+
+
+
+
+;;; 4Clojure Question 53
+;;
+;; Given a vector of integers, find the longest consecutive sub-sequence of increasing numbers. If two sub-sequences have the same length, use the one that occurs first. An increasing sub-sequence must have a length of 2 or greater to qualify.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; use reduced to stop reduction
+;; http://stackoverflow.com/questions/23822260/how-to-stop-a-reduce-function-from-processing-the-list-once-the-desired-accumula
+(reduce (fn [sum x] 
+          (if (> sum 10) 
+            (reduced 10) 
+            (+ sum x))) 
+        0 
+        [1 2 3 4 5 6 7 8 9 10])
+
+
+;; take values from a sequence while it is strictly increasing
+(defn take-while-inc [sq]
+  (loop [acc [(first sq)]
+         sq1 (rest sq)]
+    (if (or (empty? sq1) (>= (last acc) (first sq1)))
+      acc
+      (recur (conj acc (first sq1)) (rest sq1)))))
+
+(take-while-inc [0 1 2 3 0 4 5])
+(take-while-inc [0 1 2])
+
+;; Create a strictly increasing sequence starting at each position
+(defn seq-at-each-pos [sq]
+  (loop [acc []
+         sq2 sq]
+    (if (empty? sq2)
+      acc
+      (recur (conj acc (take-while-inc sq2)) (rest sq2)))))
+
+;; unify these helpers
+(defn __ [sq]
+  (let [seq-at-each-pos1 (seq-at-each-pos sq)
+        lengths          (map count seq-at-each-pos1)
+        max-length       (reduce max lengths)
+        answer           (first (drop-while #(< (count %) max-length) seq-at-each-pos1))]
+    ;;
+    (if (= 1 (count answer))
+      []
+      answer)))
+
+
+;; as one function
+
+
+(defn __ [sq]
+  (let [;; helper function 1: take values from a sequence while it is strictly increasing
+        take-while-inc (fn [sq]
+                         (loop [acc [(first sq)]
+                                sq1 (rest sq)]
+                           (if (or (empty? sq1) (>= (last acc) (first sq1)))
+                             acc
+                             (recur (conj acc (first sq1)) (rest sq1)))))
+        ;; helper function 2: Create a strictly increasing sequence starting at each position
+        seq-at-each-pos (fn  [sq]
+                          (loop [acc []
+                                 sq2 sq]
+                            (if (empty? sq2)
+                              acc
+                              (recur (conj acc (take-while-inc sq2)) (rest sq2)))))
+        ;; Obtain strictly increasing sequences
+        seq-at-each-pos1 (seq-at-each-pos sq)
+        ;; Check their length
+        lengths          (map count seq-at-each-pos1)
+        ;; Obtain the max
+        max-length       (reduce max lengths)
+        ;; Get the first sequence with the max length
+        answer           (first (drop-while #(< (count %) max-length) seq-at-each-pos1))]
+    ;;
+    ;; Drop one element answer
+    (if (= 1 (count answer))
+      []
+      answer)))
+
+(= (__ [1 0 1 2 3 0 4 5]) [0 1 2 3])
+(= (__ [5 6 1 3 2 7]) [5 6])
+(= (__ [2 3 3 4 5]) [3 4 5])
+(= (__ [7 6 5 4]) [])
+
