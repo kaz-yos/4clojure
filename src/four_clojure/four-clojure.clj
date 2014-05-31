@@ -1110,7 +1110,7 @@
            acc (first seq-groups)]
       ;; check for non-unique values (max frequency = n-args)
       (if (= (apply max (vals (frequencies acc))) n-args)
-        ;; if met, 
+        ;; if met,
         (->> (frequencies acc)
              ;; pick the [k v] with v = n-args
              (filter #(= (val %) n-args),  )
@@ -1123,7 +1123,7 @@
 ;; pcl
 (defn __ [& xs]
   (/ (apply * xs)
-     
+
      (reduce #(if (zero? %2)
                 %
                 (recur %2 (mod % %2)))
@@ -2128,7 +2128,7 @@
                  (cond
                   ;; leave terminal node alone
                   ((complement coll?) x) [x]
-                  ;; if it is a collection node, with terminals only, sort it
+                  ;; if it is a collection node, with terminals only, sort it by first element
                   (and (coll? x) (every? (complement coll?) x)) (sort x)
                   ;; Otherwise recur
                   :else (for [node     x
@@ -2152,19 +2152,137 @@
         b (last   tree)
         ;; recuring function
         tree-sort (fn tree-sort [x]
-                 (cond
-                  ;; leave terminal node alone
-                  ((complement coll?) x) x
-                  ;; if it is a collection node, with terminals only, sort it
-                  (and (coll? x) (every? (complement coll?) x)) (sort x)
-                  ;; Otherwise recur
-                  :else (for [node     x
-                              solution [(tree-sort node)]]
-                          solution)))]
+                    (cond
+                     ;; leave terminal node alone
+                     ((complement coll?) x) [x]
+                     ;; if it is a collection node, with terminals only,
+                     (and (coll? x) (every? (complement coll?) x)) (reverse (sort x))
+                     ;; Otherwise recur
+                     ;; sort the node with collections first.
+                     ;; sort it by first element (coll) or element itself
+                     :else (for [node     (sort-by #(if (coll? %) (first %) %) x)
+                                 solution [(tree-sort (node))]]
+                             solution)))]
     ;;
-    (= (tree-sort a) (tree-sort b))
+    [(tree-sort a) (tree-sort b)]
+    ;; (= (tree-sort a) (tree-sort b))
     ))
 ;;
+(sort-by #(if (coll? %) (first %) %) '(:a (:c nil nil) :d (:b nil nil) ))
+
+;;
+(defn __ [tree]
+  (let [a (first  tree)
+        b (second tree)
+        c (last   tree)
+        ;; recuring function
+        tree-sort (fn tree-sort [x]
+                    (cond
+                     ;;
+                     ;; leave terminal node (one element, not a collection) alone
+                     ((complement coll?) x) x
+                     ;; if it is a collection node, with terminal nodes only,
+                     ;; reverse sort
+                     (and (coll? x) (every? (complement coll?) x)) (reverse (sort x))
+                     ;; Otherwise recur
+                     ;; sort the node with collections first.
+                     ;; sort it by first element (coll) or element itself
+                     :else (for [node     (reverse (sort-by #(if (coll? %) (first %) %) x))
+                                 solution [(tree-sort node)]]
+                             solution)))]
+    ;; return sorted list
+    [a (tree-sort b) (tree-sort c)]
+    ;; check for balance. a is not needed
+    ;; (= (tree-sort b) (tree-sort c))
+    ))
+
+(__ '(:a (:b (:c nil nil) nil) (:b nil nil)))
+
+;; comparison strategy. wrong
+(defn __ [tree]
+  
+  (cond
+   ;; if at the terminal, check second and third elements for equality
+   (and (coll? tree) (every? (complement coll?) tree)) (= (second tree) (last tree))
+   ;;         
+        ))
+
+
+;;
+(defn __ [tree]
+  (let [a (first  tree)
+        b (second tree)
+        c (last   tree)
+        ;; recuring function
+        tree-rev (fn tree-rev [x]
+                   (cond
+                    ;;
+                    ;; if it is an element, not a collection, leave it alone
+                    ((complement coll?) x) x
+                    ;; if it is a collection node with terminal elements only, leave it alone
+                    (and (coll? x) (every? (complement coll?) x)) x
+                    ;; Otherwise (collection of at least one collection node)
+                    ;; reverse 2nd and 3rd elements
+                    ;; sort it by first element (coll) or element itself
+                    :else (for [node     [(first x) (last x) (second x)]
+                                solution [(tree-rev node)]]
+                            solution)))]
+    ;; return sorted list
+    ;; [a b (tree-rev c)]
+    ;; check for balance. a is not needed
+    (= b (tree-rev c))
+    ))
+
+;; simpler recursion
+(defn __ [tree]
+  (let [a (first  tree)
+        b (second tree)
+        c (last   tree)
+        ;; recuring function
+        tree-rev (fn tree-rev [a b c]
+                   [a
+                    ;; c second
+                    (if (coll? c)
+                      tree-rev c
+                      c)
+                    ;; b third
+                    (if (coll? b)
+                      tree-rev b
+                      b)])]
+    ;;
+    (= b (tree-rev c))))
+
+
+;; 0x89
+(deffn __ [x]
+  (let [mirrored (fn mirrored [t]
+                   (if (sequential? t)
+                     ;; if it is a sequence reverse left and right and recur
+                     (let [h (first t)
+                           l (second t)
+                           r (nth t 2)]
+                       [h (mirrored r) (mirrored l)])
+                     ;; if not a sequence, leave it alone
+                     t))
+        ;;
+        l (second x)   
+        r (nth x 2)]
+    ;;
+    (= l (mirrored r))))
+
+;; pcl
+(defn __ [[_ L R]]
+  (letfn
+      [(flip [[v l r]]
+         (list v
+               (if (coll? r) (flip r) r)
+               (if (coll? l) (flip l) l)))]
+    ;
+    (= L (flip R))))
+
+[1
+ [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
+ (2 (3 nil (4 [6 nil nil] [5 nil nil])) nil)]
 
 (= (__ '(:a (:b nil nil) (:b nil nil))) true)
 (= (__ '(:a (:b nil nil) nil)) false)
@@ -2172,6 +2290,7 @@
 (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
           [2 [3 nil [4 [6 nil nil] [5 nil nil]]] nil]])
    true)
+;; this is true if sorted, but not true if unsorted
 (= (__ [1 [2 nil [3 [4 [5 nil nil] [6 nil nil]] nil]]
           [2 [3 nil [4 [5 nil nil] [6 nil nil]]] nil]])
    false)
@@ -2275,7 +2394,7 @@
       ;;
       :else (for [node     amap
                   solution (__ (val node) (conj acc (key node)))]
-              ;; 
+              ;;
               solution))))
 
 
@@ -2296,7 +2415,7 @@
    '{[m 1] [a b c], [m 3] nil})
 
 (defn __ [x] (into {}
-                   (for 
+                   (for
                        [[k v] x
                         [k2 v2] v]
                      [[k k2] v2])))
@@ -2383,7 +2502,7 @@
    ;; or all of these
    (and
     (sequential? x)
-    (= 3 (count x)) 
+    (= 3 (count x))
     (not (sequential? (first x))) ; first element is not sequence
     (tree? (second x)) ; 2nd element is also meet these criteria
     (tree? (nth x 2))  ; 3rd element is also meet these criteria
