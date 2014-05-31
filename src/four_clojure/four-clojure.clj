@@ -2992,3 +2992,90 @@
 (= {:a [1]} (__ [:a 1]))
 (= {:a [1], :b [2]} (__ [:a 1, :b 2]))
 (= {:a [1 2 3], :b [], :c [4]} (__ [:a 1 2 3 :b :c 4]))
+
+
+
+
+;; 4Clojure Question 60
+;;
+;; Write a function which behaves like reduce, but returns each intermediate value of the reduction.  Your function must accept either two or three arguments, and the return sequence must be lazy.
+;;
+;; Restrictions (please don't use these function(s)): reductions
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; sig: fun, initial val, seq -> seq
+;; purpose reduction
+
+;; reduce part
+(defn __ [f & args]
+  ;; obtain initial value, and the rest of the sequence
+  (let [init (if (= 1 (count args))
+               (first (first args))
+               (first args))
+        sq   (if (= 1 (count args))
+               (rest (first args))
+               (second args))]
+    (reduce f init sq)))
+
+;; first two steps only
+(defn __ [f & args]
+  ;; obtain initial value, and the rest of the sequence
+  (let [init (if (= 1 (count args))
+               (first (first args))
+               (first args))
+        sq   (if (= 1 (count args))
+               (rest (first args))
+               (second args))]
+    [init (f init (first sq))]))
+
+;; recursion
+(defn __ [f & args]
+  ;; obtain initial value, and the rest of the sequence
+  (let [init (if (= 1 (count args))
+               (first (first args))
+               (first args))
+        sq   (if (= 1 (count args))
+               (rest (first args))
+               (second args))
+        fun  (fn fun [a b]
+               (if (empty? b)
+                 []
+                 [(f a (first b))
+                  (fun (f a (first b)) (rest b))]))]
+    
+    [init (fun init sq)]
+    ))
+
+;;
+(defn __ [f & args]
+  ;; obtain initial value, and the rest of the sequence
+  (let [;; initial value
+        init (if (= 1 (count args))
+               (first (first args))
+               (first args))
+        ;; the rest of the sequence
+        sq   (if (= 1 (count args))
+               (rest (first args))
+               (second args))
+        ;; function for recursion
+        fun  (fn fun [a b]
+               (loop [a1 a
+                      b1 b
+                      acc []]
+
+                 (if (empty? b1)
+                   acc
+                   (recur (f a1 (first b1)) (rest b1) (conj acc (f a1 (first b1)))))
+                 ))]
+    
+    (conj (fun init sq) init)
+    ))
+
+
+(__ conj [1] [2 3 4])
+
+
+(= (take 5 (__ + (range))) [0 1 3 6 10])
+(= (__ conj [1] [2 3 4]) [[1] [1 2] [1 2 3] [1 2 3 4]])
+(= (last (__ * 2 [3 4 5])) (reduce * 2 [3 4 5]) 120)
