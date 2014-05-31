@@ -2957,7 +2957,7 @@
 
 
 
-;; 4Clojure Question 105
+;;; 4Clojure Question 105
 ;;
 ;; Given an input sequence of keywords and numbers, create a map such that each key in the map is a keyword, and the value is a sequence of all the numbers (if any) between it and the next keyword in the sequence.
 ;;
@@ -2996,7 +2996,7 @@
 
 
 
-;; 4Clojure Question 60
+;;; 4Clojure Question 60
 ;;
 ;; Write a function which behaves like reduce, but returns each intermediate value of the reduction.  Your function must accept either two or three arguments, and the return sequence must be lazy.
 ;;
@@ -3118,3 +3118,43 @@
 (= (take 5 (__ + (range))) [0 1 3 6 10])
 (= (__ conj [1] [2 3 4]) [[1] [1 2] [1 2 3] [1 2 3 4]])
 (= (last (__ * 2 [3 4 5])) (reduce * 2 [3 4 5]) 120)
+
+
+
+
+;;; 4Clojure Question 75
+;;
+;; Two numbers are coprime if their greatest common divisor equals 1.  Euler's totient function f(x) is defined as the number of positive integers less than x which are coprime to x.  The special case f(1) equals 1.  Write a function which calculates Euler's totient function.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(defn gcd [a b]
+  (let [min-ab (min a b)
+        divs   (range (inc min-ab) 0 -1)]
+    (first (filter #(= 0 (rem a %) (rem b %)) divs))))
+
+(gcd 1 2)
+(gcd 2 4)
+(gcd 105 35)
+
+(defn __ [n]
+  ;; define greatest common divisor function
+  (let [gcd (fn [a b]
+              (let [min-ab (min a b)
+                    divs   (range (inc min-ab) 0 -1)]
+                (first (filter #(= 0 (rem a %) (rem b %)) divs))))]
+    ;; use it 
+    (if (= n 1)
+      ;; special case for n = 1
+      1
+      ;; count integers < n that have gcd of 1 with number n
+      (count (filter #(= 1 (gcd n %)) (range 1 n))))))
+
+(= (__ 1) 1)
+(= (__ 10) (count '(1 3 7 9)) 4)
+(= (__ 40) 16)
+(= (__ 99) 60)
+
+
+
+
