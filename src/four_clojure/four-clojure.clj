@@ -2200,11 +2200,11 @@
 
 ;; comparison strategy. wrong
 (defn __ [tree]
-  
+
   (cond
    ;; if at the terminal, check second and third elements for equality
    (and (coll? tree) (every? (complement coll?) tree)) (= (second tree) (last tree))
-   ;;         
+   ;;
         ))
 
 
@@ -2265,7 +2265,7 @@
                      ;; if not a sequence, leave it alone
                      t))
         ;;
-        l (second x)   
+        l (second x)
         r (nth x 2)]
     ;;
     (= l (mirrored r))))
@@ -3043,11 +3043,11 @@
                  []
                  [(f a (first b))
                   (fun (f a (first b)) (rest b))]))]
-    
+
     [init (fun init sq)]
     ))
 
-;;
+;; non lazy version
 (defn __ [f & args]
   ;; obtain initial value, and the rest of the sequence
   (let [;; initial value
@@ -3060,20 +3060,59 @@
                (second args))
         ;; function for recursion
         fun  (fn fun [a b]
-               (loop [a1 a
-                      b1 b
-                      acc []]
+               (loop [a1   a
+                      b1   b
+                      acc [a1]]
+                 ;;
+                 (let [first-b1 (first b1)]
+                   (if (empty? b1)
+                     acc
+                     (recur (f a1 first-b1) (rest b1) (conj acc (f a1 first-b1)))))))]
+    ;;
+    (fun init sq)))
 
-                 (if (empty? b1)
-                   acc
-                   (recur (f a1 (first b1)) (rest b1) (conj acc (f a1 (first b1)))))
-                 ))]
-    
-    (conj (fun init sq) init)
-    ))
+
+;; what we want using reductions
+(defn __
+  ([f args] (__ f (first args) (second args)))
+  ([f init sq]
+     (reductions f init sq)))
+
+
+;; what we want
+(take 5 (reductions + (range)))
+(reductions conj [1] [2 3 4])
+(reductions * 2 [3 4 5])
+
+;; non lazy
+(defn __
+  ([f sq] (__ f (first sq) (rest sq)))
+  ([f init sq]
+     (if (empty? sq)
+       [init]
+       (cons init (__ f (f init (first sq)) (rest sq))))))
+
+;; lazy
+(defn __
+  ([f sq] (__ f (first sq) (rest sq)))
+  ([f init sq]
+     (if (empty? sq)
+       [init]
+       (cons init (lazy-seq (__ f (f init (first sq)) (rest sq)))))))
+
+;; lazy 2
+(defn __
+  ([f sq] (__ f (first sq) (rest sq)))
+  ([f init sq]
+     (if (empty? sq)
+       [init]
+       (lazy-seq (cons init (__ f (f init (first sq)) (rest sq)))))))
 
 
 (__ conj [1] [2 3 4])
+(__ * 2 [3 4 5])
+(take 5 (__ + (range)))
+
 
 
 (= (take 5 (__ + (range))) [0 1 3 6 10])
