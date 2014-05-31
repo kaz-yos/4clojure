@@ -3158,3 +3158,218 @@
 
 
 
+;;; 4Clojure Question 86
+;;
+;; Happy numbers are positive integers that follow a particular formula: take each individual digit, square it, and then sum the squares to get a new number. Repeat with the new number and eventually, you might get to a number whose squared sum is 1. This is a happy number. An unhappy number (or sad number) is one that loops endlessly. Write a function that determines if a number is happy or not.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+
+;; sequence including 4 is infinite
+
+;; function to get the next number
+(defn next-number [n]
+  (let [seq-digits (map #(Integer/parseInt (str %)) (str n))]
+    (reduce + (map #(* % %) seq-digits))))
+
+(defn __ [n]
+  ;; define next-number
+  (let [next-number (fn [n]
+                      (let [seq-digits (map #(Integer/parseInt (str %)) (str n))]
+                        (reduce + (map #(* % %) seq-digits))))]
+    ;; stop at either 4 (failure) or 1 (success)
+    (cond
+     (= n 4) false
+     (= n 1) true
+     :else (recur (next-number n)))))
+
+;; check against numbers seen
+(defn __ [n]
+  ;; define next-number
+  (let [next-number (fn [n]
+                      (let [seq-digits (map #(Integer/parseInt (str %)) (str n))]
+                        (reduce + (map #(* % %) seq-digits))))]
+    
+    (loop [seen #{} ; set of numbers seen
+           num  n]
+      (println (str num))
+      (cond
+       (contains? seen num) false
+       (= num 1)            true
+       :else                (recur (conj seen num) (next-number num))))))
+
+
+(= (__ 7) true)
+(= (__ 986543210) true)
+(= (__ 2) false)
+(= (__ 3) false)
+
+
+
+
+;;; 4Clojure Question 93
+;;
+;; Write a function which flattens any nested combination of sequential things (lists, vectors, etc.), but maintains the lowest level sequential items.  The result should be a sequence of sequences with only one level of nesting.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+(defn __ [sq]
+  (let [my-flatten (fn my-flatten [sq]
+                     (if (every? #((complement coll?) %) sq)
+                       ;; if all elements are non-collection, return as is
+                       sq
+                       ;; otherwise, map recursion to each element
+                       (map #(my-flatten %) sq)))]
+    (map my-flatten sq)))
+
+
+(defn __ [sq]
+  (let [my-flatten (fn my-flatten [sq]
+                     (cond
+                      ;; if it is an element return as is
+                      (not (coll? sq)) sq
+                      ;; if it is a collection and there is only one element return flattened
+                      ;; (and (= 1 (count sq)) ) (flatten sq)
+                      ;; ;; if it is a collection and all its elements are collections
+                      ;; (every? coll? sq) (map flatten sq)
+                      ;; otherwise, map recursion to each element
+                      :else (map #(my-flatten %) sq)))]
+    ;;
+    (my-flatten sq)))
+
+
+;; for macro
+(defn __ [sq]
+  (let [my-flatten (fn my-flatten [sq]
+                     (cond
+                      ;; if it is an element return as is
+                      (not (coll? sq)) sq
+                      ;; if it is a collection of non-collections only
+                      (every? #((complement coll?) %) sq) [sq]
+                      ;; if it is a collection and there is only one element return flattened
+                      (= 1 (count sq))  (first sq)
+                      ;; ;; if it is a collection and all its elements are collections
+                      ;; (every? coll? sq) (map flatten sq)
+                      ;; otherwise, map recursion to each element
+                      :else (map #(my-flatten %) sq)))]
+    ;;
+    (for [elt      sq
+          solution (my-flatten elt)]
+      solution)))
+
+
+;;
+(defn __ [sq]
+  (let [my-flatten (fn my-flatten [sq]
+                     (cond
+                      ;; if it is an element return as is
+                      (not (coll? sq)) sq
+                      ;; if it is a collection of non-collections only
+                      (every? #((complement coll?) %) sq) sq
+                      ;; if it is a collection and there is only one element return flattened
+                      (= 1 (count sq))  (first sq)
+                      ;; ;; if it is a collection and all its elements are collections
+                      (every? coll? sq) (map flatten sq)
+                      ;; otherwise, map recursion to each element
+                      :else (map #(my-flatten %) sq)))]
+    ;;
+    (my-flatten sq)))
+
+
+;; sig: coll -> bool
+;; purpose: check if there is only one elemental collection inside
+;;
+(defn only-one-level [coll]
+  (cond
+   ;; if all elements are non-collections, true
+   (every? #((complement coll?) %) coll) true
+   ;; if there are non-collection elements and there are multiple elements, false
+   (> 1 (count coll)) false
+   ;; if there is only one collection element, recur inside
+   :else (recur (first coll))))
+
+(only-one-level [:a :b])
+(only-one-level [[:a :b]])
+(only-one-level [[:a :b] :c])
+
+
+(first (first [[[:a :b]]]))
+
+(__ '(((3 4) ((((5 6)))) ) ))
+
+(__ '((1 2)((3 4)((((:a :b) (5 6)))))))
+
+
+(= (__ [["Do"] ["Nothing"]])
+   [["Do"] ["Nothing"]])
+
+(= (__ [[[[:a :b]]] [[:c :d]] [:e :f]])
+   [[:a :b] [:c :d] [:e :f]])
+
+(= (__ '((1 2)((3 4)((((5 6)))))))
+   '((1 2)(3 4)(5 6)))
+
+
+
+
+;;; 4Clojure Question 158
+;;
+;; Write a function that accepts a curried function of unknown arity <i>n</i>.  Return an equivalent function of <i>n</i> arguments.
+;;
+;; <br/>
+;;
+;; You may wish to read <a href="http://en.wikipedia.org/wiki/Currying">this</a>.
+;;
+;; Use M-x 4clojure-check-answers when you're done!
+
+;; sig: fun, numbers -> fun
+;; purpose apply curried functions
+
+;; idea
+
+;; input
+(fn [a]
+  (fn [b]
+    (* a b)))
+;; return value
+(fn [a b]
+  (* a b))
+
+
+;; test
+(defn __ [fun]
+  ;; return a function
+  (fn [& args]
+    (loop [fun1  fun
+           args1 args]
+      ;;
+      (if (empty? (rest args1))
+        ;; if only one argument left, just apply the function and return result
+        (fun1 (first args1))
+        ;; if multiple arguments exist, apply the first and loop
+        (recur (fun1 (first args1)) (rest args1))))))
+
+;; when there are only two loop arguments, think of reduce
+;; pcl
+(defn __ [f]
+  (fn [& xs]
+    ;; %1 is the function from previous step, %2 is the next argument
+    (reduce #(%1 %2) f xs)))
+
+
+(= 10 ((__ (fn [a]
+             (fn [b]
+               (fn [c]
+                 (fn [d]
+                   (+ a b c d))))))
+       1 2 3 4))
+(= 24 ((__ (fn [a]
+             (fn [b]
+               (fn [c]
+                 (fn [d]
+                   (* a b c d))))))
+       1 2 3 4))
+(= 25 ((__ (fn [a]
+             (fn [b]
+               (* a b))))
+       5 5))
